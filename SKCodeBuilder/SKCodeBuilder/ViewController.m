@@ -8,13 +8,14 @@
 
 #import "ViewController.h"
 
-@interface ViewController () <NSTextFieldDelegate,NSTableViewDelegate,NSTableViewDataSource>
+@interface ViewController () <NSTextFieldDelegate>
 
 @property (weak) IBOutlet NSPopUpButton *reqTypeBtn;
 @property (weak) IBOutlet NSTextField *urlTF;
-@property (weak) IBOutlet NSSegmentedControl *segment;
-@property (weak) IBOutlet NSScrollView *keyValueScrollView;
-@property (weak) IBOutlet NSTableView *keyValueTableView;
+
+@property (unsafe_unretained) IBOutlet NSTextView *jsonTextView;
+@property (unsafe_unretained) IBOutlet NSTextView *hTextView;
+@property (unsafe_unretained) IBOutlet NSTextView *mTextView;
 
 @end
 
@@ -23,63 +24,47 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
     [self.reqTypeBtn removeAllItems];
     [self.reqTypeBtn addItemsWithTitles:@[@"GET",@"POST"]];
     [self.reqTypeBtn selectItemAtIndex:0];
-    
+}
 
-    [self.segment setSelectedSegment:0];
-    
-    self.keyValueTableView.dataSource = self;
-    self.keyValueTableView.delegate = self;
-    
-    [self.keyValueTableView editedRow];
-        
+- (void)viewDidAppear {
+    [super viewDidAppear];
+    NSString *lastUrl = [[NSUserDefaults standardUserDefaults] objectForKey:@"LAST_URL"];
+    if (lastUrl) {
+        [self.urlTF setStringValue:lastUrl];
+    }
 }
 
 - (IBAction)requestURLBtnClicked:(NSButton *)sender {
-     NSLog(@"URL = %@",self.urlTF.stringValue);
+    NSLog(@"URL = %@",self.urlTF.stringValue);
+    NSString *urlString = self.urlTF.stringValue;
+    if (!urlString || urlString.length == 0)  return;
+    __weak typeof(self) weakself = self;
+    NSURLSession *session = [NSURLSession sharedSession];
+    NSURLSessionDataTask *task = [session dataTaskWithURL:[NSURL URLWithString:urlString] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+        if (!error && data) {
+            id jsonObject = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
+            if (jsonObject) {
+                NSData *formatJsonData = [NSJSONSerialization dataWithJSONObject:jsonObject options:NSJSONWritingPrettyPrinted error:nil];
+                NSString *jsonString = [[NSString alloc] initWithData:formatJsonData encoding:NSUTF8StringEncoding];
+                [weakself configJsonTextViewWith:jsonString];
+            }
+        }
+    }];
+    [task resume];
+    [[NSUserDefaults standardUserDefaults] setObject:urlString forKey:@"LAST_URL"];
 }
 
-
-- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(nullable NSTableColumn *)tableColumn row:(NSInteger)row {
-    
-    NSLog(@"tableColumn.identifier = %@, row = %zd",tableColumn.identifier,row);
-    NSTableCellView *cellView = [[NSTableCellView alloc] init];
-    NSRect rect = CGRectMake(0, 0, tableColumn.width, 25);
-    NSTextField *textF = [[NSTextField alloc] initWithFrame:rect];
-    textF.textColor = [NSColor redColor];
-    textF.editable = NO;
-    [cellView addSubview:textF];
-    textF.stringValue = @"wushangkun";
-    return cellView;
+- (void)configJsonTextViewWith:(NSString *)jsonString {
+    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:jsonString];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.jsonTextView.textStorage setAttributedString:attrString];
+        [self.jsonTextView.textStorage setFont:[NSFont systemFontOfSize:15]];
+        [self.jsonTextView.textStorage setForegroundColor:[NSColor blueColor]];
+    });
 }
-
-//- (NSTableRowView *)tableView:(NSTableView *)tableView rowViewForRow:(NSInteger)row {
-//
-//}
-
-
-- (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
-    
-    return 20;
-}
-
-- (CGFloat)tableView:(NSTableView *)tableView heightOfRow:(NSInteger)row {
-    return 25;
-}
-
-- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-    
-    return @"4567890-=";
-}
-
-- (void)tabView:(NSTabView *)tabView didSelectTabViewItem:(NSTabViewItem *)tabViewItem {
-    
-    NSLog(@"didSelectTabViewItem = %@",tabViewItem.label);
-}
-
 
 - (void)setRepresentedObject:(id)representedObject {
     [super setRepresentedObject:representedObject];
