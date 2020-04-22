@@ -699,12 +699,12 @@
                 </windowController>
                 <customObject id="Oky-zY-oP4" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="151" y="247"/>
+            <point key="canvasLocation" x="75" y="258"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="cCd-Fb-ene">
             <objects>
-                <viewController id="dRQ-rT-4y1" customClass="ViewController" customModule="SKCodeBuilder" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="dRQ-rT-4y1" customClass="ViewController" sceneMemberID="viewController">
                     <view key="view" id="nKA-Zh-CRo">
                         <rect key="frame" x="0.0" y="0.0" width="786" height="431"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -761,6 +761,9 @@
                                     <font key="font" size="14" name="ArialRoundedMTBold"/>
                                 </buttonCell>
                                 <color key="contentTintColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <action selector="startMakeCode:" target="dRQ-rT-4y1" id="i9x-BD-ZoI"/>
+                                </connections>
                             </button>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="SPh-MG-4Hc">
                                 <rect key="frame" x="10" y="0.0" width="766" height="383"/>
@@ -771,7 +774,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="305" height="383"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="NlK-m7-eFH">
+                                                <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="bar" incrementalSearchingEnabled="YES" spellingCorrection="YES" smartInsertDelete="YES" id="NlK-m7-eFH">
                                                     <rect key="frame" x="0.0" y="0.0" width="305" height="383"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <color key="textColor" name="placeholderTextColor" catalog="System" colorSpace="catalog"/>
@@ -841,7 +844,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="460" height="230"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
-                                                <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="LI7-4D-S7A">
+                                                <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" findStyle="bar" spellingCorrection="YES" smartInsertDelete="YES" id="LI7-4D-S7A">
                                                     <rect key="frame" x="0.0" y="0.0" width="460" height="230"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                     <color key="textColor" name="placeholderTextColor" catalog="System" colorSpace="catalog"/>
@@ -897,6 +900,7 @@
                             <constraint firstItem="LeQ-w4-GU5" firstAttribute="top" secondItem="nKA-Zh-CRo" secondAttribute="top" constant="15" id="OK9-2Y-hRB"/>
                             <constraint firstItem="SPh-MG-4Hc" firstAttribute="top" secondItem="rVx-04-L6h" secondAttribute="bottom" constant="10" id="dF1-2S-E1p"/>
                             <constraint firstAttribute="trailing" secondItem="gEk-3b-8NQ" secondAttribute="trailing" constant="10" id="m4A-Sh-DWO"/>
+                            <constraint firstItem="gEk-3b-8NQ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="nKA-Zh-CRo" secondAttribute="leading" constant="20" symbolic="YES" id="vQZ-0D-sDG"/>
                             <constraint firstAttribute="bottom" secondItem="gEk-3b-8NQ" secondAttribute="bottom" constant="7" id="vw2-EO-VTG"/>
                             <constraint firstItem="PZS-yY-lMH" firstAttribute="centerY" secondItem="LeQ-w4-GU5" secondAttribute="centerY" id="vzG-TW-zcv"/>
                             <constraint firstAttribute="trailing" secondItem="rVx-04-L6h" secondAttribute="trailing" constant="10" id="yrG-9R-uJF"/>
@@ -914,7 +918,7 @@
                 <customObject id="rZq-KX-bx2" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
                 <userDefaultsController id="xae-pt-4Eg"/>
             </objects>
-            <point key="canvasLocation" x="151" y="840"/>
+            <point key="canvasLocation" x="75" y="755"/>
         </scene>
     </scenes>
     <resources>

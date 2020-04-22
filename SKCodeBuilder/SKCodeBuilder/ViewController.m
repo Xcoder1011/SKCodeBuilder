@@ -37,6 +37,29 @@
     }
 }
 
+/// start generate code....
+- (IBAction)startMakeCode:(NSButton *)sender {
+    
+    NSString *jsonString = self.jsonTextView.textStorage.string;
+    if (!jsonString || jsonString.length == 0)  return;
+    
+    jsonString = [jsonString stringByReplacingOccurrencesOfString:@"，" withString:@","];
+    jsonString = [jsonString stringByReplacingOccurrencesOfString:@"“" withString:@""];
+    
+    NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+    if (!jsonData) return;
+    
+    NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:nil];
+    BOOL isvalid = [NSJSONSerialization isValidJSONObject:jsonDict];
+    if (!isvalid) {
+        NSLog(@"warn: is not a valid JSON !!!");
+        return;
+    }
+    
+    NSLog(@">>>>>>>> startMakeCode with valid json = \n%@",jsonString);
+}
+
+/// GET request URL
 - (IBAction)requestURLBtnClicked:(NSButton *)sender {
     NSLog(@"URL = %@",self.urlTF.stringValue);
     NSString *urlString = self.urlTF.stringValue;
@@ -69,6 +92,5 @@
 - (void)setRepresentedObject:(id)representedObject {
     [super setRepresentedObject:representedObject];
 }
-
 
 @end
