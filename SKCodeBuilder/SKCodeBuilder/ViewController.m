@@ -7,6 +7,8 @@
 //
 
 #import "ViewController.h"
+#import "NSString+CodeBuilder.h"
+#import "SKCodeBuilder.h"
 
 @interface ViewController () <NSTextFieldDelegate>
 
@@ -17,8 +19,9 @@
 @property (unsafe_unretained) IBOutlet NSTextView *hTextView;
 @property (unsafe_unretained) IBOutlet NSTextView *mTextView;
 
-@end
+@property (nonatomic, strong) SKCodeBuilder *builder;
 
+@end
 
 @implementation ViewController
 
@@ -41,22 +44,27 @@
 - (IBAction)startMakeCode:(NSButton *)sender {
     
     NSString *jsonString = self.jsonTextView.textStorage.string;
-    if (!jsonString || jsonString.length == 0)  return;
-    
-    jsonString = [jsonString stringByReplacingOccurrencesOfString:@"，" withString:@","];
-    jsonString = [jsonString stringByReplacingOccurrencesOfString:@"“" withString:@""];
-    
-    NSData *jsonData = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
-    if (!jsonData) return;
-    
-    NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:nil];
+    NSDictionary *jsonDict = [jsonString _toJsonDict];
     BOOL isvalid = [NSJSONSerialization isValidJSONObject:jsonDict];
     if (!isvalid) {
+        NSAlert *alert = [[NSAlert alloc] init];
+        [alert setMessageText:@"warn: is not a valid JSON !!!"];
+        [alert setAlertStyle:NSAlertStyleWarning];
+        [alert beginSheetModalForWindow:self.view.window completionHandler:nil];
         NSLog(@"warn: is not a valid JSON !!!");
         return;
     }
+    // NSLog(@">>>>>>>> startMakeCode with valid json = \n%@",jsonString);
     
-    NSLog(@">>>>>>>> startMakeCode with valid json = \n%@",jsonString);
+    NSMutableString *string = [self.builder build_OC_h_withDict:jsonDict];
+    NSLog(@">>>>>>>> build_OC_h_withDict = \n%@",string);
+
+    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.hTextView.textStorage setAttributedString:attrString];
+        [self.hTextView.textStorage setFont:[NSFont systemFontOfSize:15]];
+        [self.hTextView.textStorage setForegroundColor:[NSColor blackColor]];
+    });
 }
 
 /// GET request URL
@@ -87,6 +95,13 @@
         [self.jsonTextView.textStorage setFont:[NSFont systemFontOfSize:15]];
         [self.jsonTextView.textStorage setForegroundColor:[NSColor blueColor]];
     });
+}
+
+- (SKCodeBuilder *)builder {
+    if (!_builder) {
+        _builder = [[SKCodeBuilder alloc] init];
+    }
+    return _builder;
 }
 
 - (void)setRepresentedObject:(id)representedObject {
