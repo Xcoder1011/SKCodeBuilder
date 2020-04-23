@@ -100,6 +100,9 @@
 - (SKCodeBuilder *)builder {
     if (!_builder) {
         _builder = [[SKCodeBuilder alloc] init];
+//        SKCodeBuilderConfig *config = [SKCodeBuilderConfig new];
+//        config.superClassName = @"DTYYModelEntity";
+//        _builder.config = config;
     }
     return _builder;
 }

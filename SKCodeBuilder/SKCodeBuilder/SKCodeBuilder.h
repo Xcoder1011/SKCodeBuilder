@@ -25,6 +25,9 @@
 @property (nonatomic, copy) NSString *superClassName;
 /// root model name ... 默认"NSRootModel"
 @property (nonatomic, copy) NSString *rootModelName;
+/// model name prefix  ... 默认"NS"
+@property (nonatomic, copy) NSString *modelNamePrefix;
 
 @end
+
 
