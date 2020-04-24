@@ -11,12 +11,12 @@
 @class SKCodeBuilderConfig;
 @interface SKCodeBuilder : NSObject
 
+typedef void (^BuildComplete)(NSMutableString *hString, NSMutableString *mString);
+
+
 @property (nonatomic, strong) SKCodeBuilderConfig *config;
 
-- (NSMutableString *)build_OC_withDict:(NSDictionary *)jsonDict;
-
-- (NSMutableString *)build_OC_h_withDict:(NSDictionary *)jsonDict;
-- (NSMutableString *)build_OC_m_withDict:(NSDictionary *)jsonDict;
+- (void)build_OC_withDict:(NSDictionary *)jsonDict complete:(BuildComplete)complete;
 
 @end
 

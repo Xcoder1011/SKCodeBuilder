@@ -55,18 +55,15 @@
         return;
     }
     
-    [self configJsonTextViewWith:jsonString];
-    // NSLog(@">>>>>>>> startMakeCode with valid json = \n%@",jsonString);
-    NSMutableString *string = [self.builder build_OC_h_withDict:jsonDict];
-    // NSLog(@">>>>>>>> build_OC_h_withDict = \n%@",string);
-
-    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.hTextView.textStorage setAttributedString:attrString];
-        [self.hTextView.textStorage setFont:[NSFont systemFontOfSize:15]];
-        [self.hTextView.textStorage setForegroundColor:[NSColor colorWithCalibratedRed:215/255.f green:0/255.f  blue:143/255.f  alpha:1.0]];
-    });
+    [self configJsonTextViewWith:jsonString textView:self.jsonTextView color:[NSColor blueColor]];
+    __weak typeof(self) weakself = self;
+    [self.builder build_OC_withDict:jsonDict complete:^(NSMutableString *hString, NSMutableString *mString) {
+        NSColor *color = [NSColor colorWithCalibratedRed:215/255.f green:0/255.f  blue:143/255.f  alpha:1.0];
+        [weakself configJsonTextViewWith:hString textView:weakself.hTextView color:color];
+        [weakself configJsonTextViewWith:mString textView:weakself.mTextView color:color];
+    }];
 }
+
 
 /// GET request URL
 - (IBAction)requestURLBtnClicked:(NSButton *)sender {
@@ -81,7 +78,7 @@
             if (jsonObject) {
                 NSData *formatJsonData = [NSJSONSerialization dataWithJSONObject:jsonObject options:NSJSONWritingPrettyPrinted error:nil];
                 NSString *jsonString = [[NSString alloc] initWithData:formatJsonData encoding:NSUTF8StringEncoding];
-                [weakself configJsonTextViewWith:jsonString];
+                [weakself configJsonTextViewWith:jsonString textView:weakself.jsonTextView color:[NSColor blueColor]];
             }
         }
     }];
@@ -89,12 +86,12 @@
     [[NSUserDefaults standardUserDefaults] setObject:urlString forKey:@"LAST_URL"];
 }
 
-- (void)configJsonTextViewWith:(NSString *)jsonString {
-    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:jsonString];
+- (void)configJsonTextViewWith:(NSString *)text textView:(NSTextView *)textView color:(NSColor *)color {
+    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:text];
     dispatch_async(dispatch_get_main_queue(), ^{
-        [self.jsonTextView.textStorage setAttributedString:attrString];
-        [self.jsonTextView.textStorage setFont:[NSFont systemFontOfSize:15]];
-        [self.jsonTextView.textStorage setForegroundColor:[NSColor blueColor]];
+        [textView.textStorage setAttributedString:attrString];
+        [textView.textStorage setFont:[NSFont systemFontOfSize:15]];
+        [textView.textStorage setForegroundColor:color];
     });
 }
 

@@ -12,6 +12,9 @@
 /// 接下来需要处理的 字典 key - value
 @property (nonatomic, strong) NSMutableDictionary *handleDicts;
 
+@property (nonatomic, strong) NSMutableString *hString;
+@property (nonatomic, strong) NSMutableString *mString;
+
 @end
 
 @implementation SKCodeBuilder
@@ -22,14 +25,13 @@
     }
     return self;
 }
-
-- (NSMutableString *)build_OC_withDict:(NSDictionary *)jsonDict {
-    return nil;
-}
-
-- (NSMutableString *)build_OC_h_withDict:(NSDictionary *)jsonDict {
+- (void)build_OC_withDict:(NSDictionary *)jsonDict complete:(BuildComplete)complete {
+    
     NSMutableString *hString = [NSMutableString string];
-    [self handleDictValue:jsonDict key:@"" hString:hString];
+    NSMutableString *mString = [NSMutableString string];
+
+    [self handleDictValue:jsonDict key:@"" hString:hString mString:mString];
+    
     if ([self.config.superClassName isEqualToString:@"NSObject"]) { // 默认
         [hString insertString:@"\n#import <Foundation/Foundation.h>\n\n" atIndex:0];
     } else {
@@ -51,11 +53,10 @@
                                 "//\n", self.config.rootModelName, self.config.authorName, time, year];
     
     [hString insertString:commentString atIndex:0];
-    return hString;
-}
-
-- (NSMutableString *)build_OC_m_withDict:(NSDictionary *)jsonDict {
-    return nil;
+    
+    if (complete) {
+        complete(hString, mString);
+    }
 }
 
 - (NSString *)modelNameWithKey:(NSString *)key
@@ -71,14 +72,19 @@
     return [NSString stringWithFormat:@"%@Model",key];
 }
 
-- (void)handleDictValue:(NSDictionary *)dictValue key:(NSString *)key hString:(NSMutableString *)hString {
+- (void)handleDictValue:(NSDictionary *)dictValue key:(NSString *)key hString:(NSMutableString *)hString mString:(NSMutableString *)mString{
    
     if (key && key.length) { // sub model
         NSString *modelName = [self modelNameWithKey:key];
         [hString insertString:[NSString stringWithFormat:@"@class %@;\n", modelName] atIndex:0];
         [hString appendFormat:@"\n\n@interface %@ : %@\n\n", modelName ,self.config.superClassName];
+        
+        [mString appendFormat:@"\n\n@implementation %@\n\n", modelName];
+
     } else { // Root model
         [hString appendFormat:@"\n\n@interface %@ : %@\n\n", self.config.rootModelName ,self.config.superClassName];
+        
+        [mString appendFormat:@"\n\n@implementation %@\n\n", self.config.rootModelName];
     }
     
     [dictValue enumerateKeysAndObjectsUsingBlock:^(NSString *  _Nonnull key, id  _Nonnull value, BOOL * _Nonnull stop) {
@@ -112,6 +118,7 @@
     }];
     
     [hString appendFormat:@"\n@end\n\n"];
+    [mString appendFormat:@"\n@end\n\n"];
     
     if (key.length) {
         NSLog(@">>>>> self.handleDicts removeObjectForKey: >>>>> %@ ,total: %zd",key , self.handleDicts.count);
@@ -121,7 +128,7 @@
     if (self.handleDicts.count) {
         NSString *firstKey = self.handleDicts.allKeys.firstObject;
         NSDictionary *firstObject = self.handleDicts[firstKey];
-        [self handleDictValue:firstObject key:firstKey hString:hString];
+        [self handleDictValue:firstObject key:firstKey hString:hString mString:mString];
     }
 }
 
