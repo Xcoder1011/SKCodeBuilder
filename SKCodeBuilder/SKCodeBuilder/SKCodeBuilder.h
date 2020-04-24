@@ -21,12 +21,14 @@
 @end
 
 @interface SKCodeBuilderConfig : NSObject
-/// model继承类名... 默认"NSObject"
+/// model继承类名... default "NSObject"
 @property (nonatomic, copy) NSString *superClassName;
-/// root model name ... 默认"NSRootModel"
+/// root model name ... default "NSRootModel"
 @property (nonatomic, copy) NSString *rootModelName;
-/// model name prefix  ... 默认"NS"
+/// model name prefix  ... default "NS"
 @property (nonatomic, copy) NSString *modelNamePrefix;
+/// authorName  ... default "SKCodeBuilder"
+@property (nonatomic, copy) NSString *authorName;
 
 @end
 

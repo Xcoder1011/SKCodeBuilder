@@ -8,6 +8,3 @@
 
 #import "TestModel.h"
 
-@implementation TestModel
-
-@end

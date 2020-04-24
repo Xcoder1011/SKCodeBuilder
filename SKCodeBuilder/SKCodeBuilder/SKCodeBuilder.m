@@ -29,8 +29,28 @@
 
 - (NSMutableString *)build_OC_h_withDict:(NSDictionary *)jsonDict {
     NSMutableString *hString = [NSMutableString string];
-    // [hString appendFormat:@"\n#import <Foundation/Foundation.h>\n\n"];
     [self handleDictValue:jsonDict key:@"" hString:hString];
+    if ([self.config.superClassName isEqualToString:@"NSObject"]) { // 默认
+        [hString insertString:@"\n#import <Foundation/Foundation.h>\n\n" atIndex:0];
+    } else {
+        [hString insertString:[NSString stringWithFormat:@"\n#import \"%@.h\"\n\n",self.config.superClassName] atIndex:0];
+    }
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy/MM/dd"];
+    NSString *time = [dateFormatter stringFromDate:[NSDate date]];
+    NSString *year = [[time componentsSeparatedByString:@"/"] firstObject];
+
+    NSString *commentString = [NSString stringWithFormat:
+                               @"//\n"
+                                "//  %@.h\n"
+                                "//  SKCodeBuilder\n"
+                                "//\n"
+                                "//  Created by %@ on %@.\n"
+                                "//  Copyright © %@ SKCodeBuilder. All rights reserved.\n"
+                                "//\n", self.config.rootModelName, self.config.authorName, time, year];
+    
+    [hString insertString:commentString atIndex:0];
     return hString;
 }
 
@@ -170,6 +190,7 @@
         _superClassName = @"NSObject";
         _rootModelName = @"NSRootModel";
         _modelNamePrefix = @"NS";
+        _authorName = @"SKCodeBuilder";
     }
     return self;
 }

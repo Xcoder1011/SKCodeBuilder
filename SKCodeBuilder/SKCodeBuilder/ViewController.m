@@ -54,16 +54,17 @@
         NSLog(@"warn: is not a valid JSON !!!");
         return;
     }
-    // NSLog(@">>>>>>>> startMakeCode with valid json = \n%@",jsonString);
     
+    [self configJsonTextViewWith:jsonString];
+    // NSLog(@">>>>>>>> startMakeCode with valid json = \n%@",jsonString);
     NSMutableString *string = [self.builder build_OC_h_withDict:jsonDict];
-    NSLog(@">>>>>>>> build_OC_h_withDict = \n%@",string);
+    // NSLog(@">>>>>>>> build_OC_h_withDict = \n%@",string);
 
     NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:string];
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.hTextView.textStorage setAttributedString:attrString];
         [self.hTextView.textStorage setFont:[NSFont systemFontOfSize:15]];
-        [self.hTextView.textStorage setForegroundColor:[NSColor blackColor]];
+        [self.hTextView.textStorage setForegroundColor:[NSColor colorWithCalibratedRed:215/255.f green:0/255.f  blue:143/255.f  alpha:1.0]];
     });
 }
 
@@ -100,9 +101,10 @@
 - (SKCodeBuilder *)builder {
     if (!_builder) {
         _builder = [[SKCodeBuilder alloc] init];
-//        SKCodeBuilderConfig *config = [SKCodeBuilderConfig new];
-//        config.superClassName = @"DTYYModelEntity";
-//        _builder.config = config;
+        SKCodeBuilderConfig *config = [SKCodeBuilderConfig new];
+        config.rootModelName = @"TestModel";
+        config.authorName = @"wushangkun";
+        _builder.config = config;
     }
     return _builder;
 }
