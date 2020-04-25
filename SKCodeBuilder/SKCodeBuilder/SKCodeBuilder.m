@@ -38,12 +38,15 @@
         [hString insertString:[NSString stringWithFormat:@"\n#import \"%@.h\"\n\n",self.config.superClassName] atIndex:0];
     }
     
+    [mString insertString:[NSString stringWithFormat:@"\n#import \"%@.h\"\n\n",self.config.rootModelName] atIndex:0];
+
+    
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy/MM/dd"];
     NSString *time = [dateFormatter stringFromDate:[NSDate date]];
     NSString *year = [[time componentsSeparatedByString:@"/"] firstObject];
 
-    NSString *commentString = [NSString stringWithFormat:
+    NSString *hCommentString = [NSString stringWithFormat:
                                @"//\n"
                                 "//  %@.h\n"
                                 "//  SKCodeBuilder\n"
@@ -52,7 +55,17 @@
                                 "//  Copyright © %@ SKCodeBuilder. All rights reserved.\n"
                                 "//\n", self.config.rootModelName, self.config.authorName, time, year];
     
-    [hString insertString:commentString atIndex:0];
+    NSString *mCommentString = [NSString stringWithFormat:
+                               @"//\n"
+                               "//  %@.m\n"
+                               "//  SKCodeBuilder\n"
+                               "//\n"
+                               "//  Created by %@ on %@.\n"
+                               "//  Copyright © %@ SKCodeBuilder. All rights reserved.\n"
+                               "//\n", self.config.rootModelName, self.config.authorName, time, year];
+    
+    [hString insertString:hCommentString atIndex:0];
+    [mString insertString:mCommentString atIndex:0];
     
     if (complete) {
         complete(hString, mString);
