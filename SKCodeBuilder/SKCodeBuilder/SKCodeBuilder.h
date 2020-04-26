@@ -9,10 +9,10 @@
 #import <Foundation/Foundation.h>
 
 @class SKCodeBuilderConfig;
+
 @interface SKCodeBuilder : NSObject
 
 typedef void (^BuildComplete)(NSMutableString *hString, NSMutableString *mString);
-
 
 @property (nonatomic, strong) SKCodeBuilderConfig *config;
 
@@ -21,6 +21,7 @@ typedef void (^BuildComplete)(NSMutableString *hString, NSMutableString *mString
 @end
 
 @interface SKCodeBuilderConfig : NSObject
+
 /// model继承类名... default "NSObject"
 @property (nonatomic, copy) NSString *superClassName;
 /// root model name ... default "NSRootModel"
