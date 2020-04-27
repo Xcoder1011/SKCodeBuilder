@@ -19,4 +19,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface NSDictionary (CodeBuilder)
+
+- (NSString *)_toJsonString;
+
+@end
+
 NS_ASSUME_NONNULL_END

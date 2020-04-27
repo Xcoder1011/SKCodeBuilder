@@ -15,6 +15,8 @@ static NSString *const SuperClassNameCacheKey = @"SuperClassNameCacheKey";
 static NSString *const ModelNamePrefixCacheKey = @"ModelNamePrefixCacheKey";
 static NSString *const RootModelNameCacheKey = @"RootModelNameCacheKey";
 static NSString *const AuthorNameCacheKey = @"AuthorNameCacheKey";
+static NSString *const BuildCodeTypeCacheKey = @"BuildCodeTypeCacheKey";
+static NSString *const SupportJSONModelTypeCacheKey = @"SupportJSONModelTypeCacheKey";
 
 @interface ViewController () <NSTextFieldDelegate>
 {
@@ -33,6 +35,9 @@ static NSString *const AuthorNameCacheKey = @"AuthorNameCacheKey";
 @property (weak) IBOutlet NSTextField *rootModelNameTF;
 @property (weak) IBOutlet NSTextField *authorNameTF;
 
+@property (weak) IBOutlet NSPopUpButton *codeTypeBtn;
+@property (weak) IBOutlet NSPopUpButton *jsonTypeBtn;
+
 @property (nonatomic, strong) SKCodeBuilder *builder;
 
 @end
@@ -41,9 +46,14 @@ static NSString *const AuthorNameCacheKey = @"AuthorNameCacheKey";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+   
     [self.reqTypeBtn removeAllItems];
     [self.reqTypeBtn addItemsWithTitles:@[@"GET",@"POST"]];
     [self.reqTypeBtn selectItemAtIndex:0];
+    
+    [self.codeTypeBtn removeAllItems];
+    [self.codeTypeBtn addItemsWithTitles:@[@"Objective-C",@"Swift"]];
+    [self.codeTypeBtn selectItemAtIndex:0];
 }
 
 - (void)viewDidAppear {
@@ -87,7 +97,9 @@ static NSString *const AuthorNameCacheKey = @"AuthorNameCacheKey";
         NSLog(@"warn: is not a valid JSON !!!");
         return;
     }
+    
     [self saveUserInputContent];
+    
     [self configJsonTextViewWith:jsonString textView:self.jsonTextView color:[NSColor blueColor]];
     __weak typeof(self) weakself = self;
     [self.builder build_OC_withDict:jsonDict complete:^(NSMutableString *hString, NSMutableString *mString) {
@@ -95,6 +107,20 @@ static NSString *const AuthorNameCacheKey = @"AuthorNameCacheKey";
         [weakself configJsonTextViewWith:hString textView:weakself.hTextView color:color];
         [weakself configJsonTextViewWith:mString textView:weakself.mTextView color:color];
     }];
+}
+
+
+- (IBAction)codeTypeBtnSelectItem:(NSPopUpButton *)sender {
+    if (sender.indexOfSelectedItem == 0) { // OC
+        
+    } else { // Swift
+        
+    }
+    NSLog(@"codeTypeBtnSelectItem: %zd",sender.indexOfSelectedItem);
+
+}
+- (IBAction)jsonTypeBtnSelectItem:(NSPopUpButton *)sender {
+    NSLog(@"jsonTypeBtnSelectItem: %zd",sender.indexOfSelectedItem);
 }
 
 /// config textView content on main thred.
@@ -126,6 +152,12 @@ static NSString *const AuthorNameCacheKey = @"AuthorNameCacheKey";
     
     NSString *authorName = [[NSUserDefaults standardUserDefaults] objectForKey:AuthorNameCacheKey];
     if (authorName) [self.authorNameTF setStringValue:authorName];
+    
+    self.builder.config.codeType = [[NSUserDefaults standardUserDefaults] integerForKey:BuildCodeTypeCacheKey];
+    [self.codeTypeBtn selectItemAtIndex:self.builder.config.codeType - 1];
+
+    self.builder.config.jsonType = [[NSUserDefaults standardUserDefaults] integerForKey:SupportJSONModelTypeCacheKey];
+    [self.jsonTypeBtn selectItemAtIndex:self.builder.config.jsonType];
 }
 
 /// save cache
@@ -146,6 +178,13 @@ static NSString *const AuthorNameCacheKey = @"AuthorNameCacheKey";
     NSString *authorName = self.authorNameTF.stringValue.length ? self.authorNameTF.stringValue : @"NSObject";
     self.builder.config.authorName = authorName;
     [[NSUserDefaults standardUserDefaults] setObject:authorName forKey:AuthorNameCacheKey];
+    
+    self.builder.config.codeType = self.codeTypeBtn.indexOfSelectedItem + 1;
+    [[NSUserDefaults standardUserDefaults] setInteger:self.builder.config.codeType forKey:BuildCodeTypeCacheKey];
+
+    self.builder.config.jsonType = self.jsonTypeBtn.indexOfSelectedItem;
+    [[NSUserDefaults standardUserDefaults] setInteger:self.builder.config.jsonType forKey:SupportJSONModelTypeCacheKey];
+    
 }
 
 /// _currentInputTF width

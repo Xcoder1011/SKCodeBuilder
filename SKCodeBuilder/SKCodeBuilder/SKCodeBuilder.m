@@ -7,10 +7,32 @@
 //
 
 #import "SKCodeBuilder.h"
+#import "NSString+CodeBuilder.h"
 
 @interface SKCodeBuilder ()
 /// 接下来需要处理的 字典 key - value
 @property (nonatomic, strong) NSMutableDictionary *handleDicts;
+
+/*
+ *  + (NSDictionary<NSString *,id> *)modelContainerPropertyGenericClass
+ *   {
+ *    return @{@"shadows" : [YYShadow class],
+ *               @"borders" : YYBorder.class,
+ *               @"attachments" : @"YYAttachment" };
+ *   }
+ */
+@property (nonatomic, strong) NSMutableDictionary *yymodelPropertyGenericClassDicts;
+
+/*
+*  + (NSDictionary<NSString *,id> *)modelCustomPropertyMapper
+*   {
+*    return @{@"name"  : @"n",
+*             @"page"  : @"p",
+*             @"desc"  : @"ext.desc",
+*             @"bookID": @[@"id", @"ID", @"book_id"]};
+*   }
+*/
+@property (nonatomic, strong) NSMutableDictionary *yymodelPropertyMapper;
 
 @property (nonatomic, strong) NSMutableString *hString;
 @property (nonatomic, strong) NSMutableString *mString;
@@ -100,6 +122,13 @@
         [mString appendFormat:@"\n\n@implementation %@\n\n", self.config.rootModelName];
     }
     
+    if (![dictValue isKindOfClass:[NSDictionary class]]) {
+        [hString appendFormat:@"\n@end\n\n"];
+        [mString appendFormat:@"\n@end\n\n"];
+        NSLog(@" handleDictValue (%@) error !!!!!!",dictValue);
+        return;
+    }
+    
     [dictValue enumerateKeysAndObjectsUsingBlock:^(NSString *  _Nonnull key, id  _Nonnull value, BOOL * _Nonnull stop) {
         
         if ([value isKindOfClass:[NSNumber class]]) {
@@ -111,13 +140,21 @@
             if ([(NSString *)value length] > 12) {
                 [hString appendFormat:@"/** %@ */\n@property (nonatomic, copy) NSString *%@;\n",key, key];
             } else {
-                [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, copy) NSString *%@;\n",value,key];
+                if (self.config.jsonType == SKCodeBuilderJSONModelTypeNone) {
+                    [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, copy) NSString *%@;\n",value,key];
+                } else {
+                    [self handleIdValue:value key:key hString:hString];
+                }
             }
             
         } else if ([value isKindOfClass:[NSDictionary class]]) {
             // NSDictionary 类型
             NSString *modelName = [self modelNameWithKey:key];
-            [hString appendFormat:@"/** %@ */\n@property (nonatomic, strong) %@ *%@;\n",key, modelName, key];
+            [hString appendFormat:@"/** %@ */\n@property (nonatomic, strong) %@ *%@;\n",key, modelName, key];\
+            
+            NSString *propertyValue = [NSString stringWithFormat:@"%@", modelName];
+            [self.yymodelPropertyGenericClassDicts setObject:propertyValue forKey:key];
+            
             [self.handleDicts setObject:value forKey:key];
             
         } else if ([value isKindOfClass:[NSArray class]]) {
@@ -131,17 +168,58 @@
     }];
     
     [hString appendFormat:@"\n@end\n\n"];
-    [mString appendFormat:@"\n@end\n\n"];
+
+    if (self.config.jsonType == SKCodeBuilderJSONModelTypeYYModel) { // 适配YYModel
+        
+        /// The generic class mapper for container properties.
+        
+        if (self.yymodelPropertyGenericClassDicts.count) {
+            [mString appendFormat:@"+ (NSDictionary<NSString *,id> *)modelContainerPropertyGenericClass\n"];
+            [mString appendFormat:@"{\n     return @{\n"];
+            [self.yymodelPropertyGenericClassDicts enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+                [mString appendFormat:@"                    @\"%@\" : %@.class,\n",key, obj];
+            }];
+            [mString appendFormat:@"                    };"];
+            [mString appendFormat:@"\n}\n"];
+        }
+        
+        /// Custom property mapper.
+        
+        if (self.yymodelPropertyMapper.count) {
+            [mString appendFormat:@"+ (nullable NSDictionary<NSString *, id> *)modelCustomPropertyMapper\n"];
+            [mString appendFormat:@"{\n     return @{\n"];
+            [self.yymodelPropertyMapper enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+                [mString appendFormat:@"                    @\"%@\" : @""\"%@\",\n",key, obj];  //   **\"
+            }];
+            [mString appendFormat:@"                    };"];
+            [mString appendFormat:@"\n}\n"];
+        }
+    }
     
     if (key.length) {
-        NSLog(@">>>>> self.handleDicts removeObjectForKey: >>>>> %@ ,total: %zd",key , self.handleDicts.count);
+        NSLog(@">>>>> self.handleDicts removeObjectForKey: >>>>> %@ ,total: %zd, keys: %@",key , self.handleDicts.count,self.handleDicts.allKeys);
         [self.handleDicts removeObjectForKey:key];
     }
-        
+    
+    [mString appendFormat:@"\n@end\n\n"];
+    
+    [self.yymodelPropertyGenericClassDicts removeAllObjects];
+    [self.yymodelPropertyMapper removeAllObjects];
+
     if (self.handleDicts.count) {
         NSString *firstKey = self.handleDicts.allKeys.firstObject;
         NSDictionary *firstObject = self.handleDicts[firstKey];
         [self handleDictValue:firstObject key:firstKey hString:hString mString:mString];
+    }
+}
+
+- (void)handleIdValue:(NSString *)idValue key:(NSString *)key hString:(NSMutableString *)hString {
+    // 字符串id 替换成 itemId
+    if ([key isEqualToString:@"id"]) {
+        [self.yymodelPropertyMapper setObject:@"id" forKey:@"itemId"];
+        [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, copy) NSString *%@;\n",idValue,@"itemId"];
+    } else {
+        [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, copy) NSString *%@;\n",idValue,key];
     }
 }
 
@@ -159,6 +237,10 @@
             // NSDictionary 类型
             NSString *modelName = [self modelNameWithKey:key];
             [self.handleDicts setObject:firstObject forKey:key];
+            
+            NSString *propertyValue = [NSString stringWithFormat:@"%@", modelName];
+            [self.yymodelPropertyGenericClassDicts setObject:propertyValue forKey:key];
+            
             [hString appendFormat:@"/** %@ */\n@property (nonatomic, strong) NSArray <%@ *> *%@;\n",key, modelName, key];
             
         } else if ([firstObject isKindOfClass:[NSArray class]]) {
@@ -201,6 +283,20 @@
     return _handleDicts;
 }
 
+- (NSMutableDictionary *)yymodelPropertyGenericClassDicts {
+    if (!_yymodelPropertyGenericClassDicts) {
+        _yymodelPropertyGenericClassDicts = [NSMutableDictionary new];
+    }
+    return _yymodelPropertyGenericClassDicts;
+}
+
+- (NSMutableDictionary *)yymodelPropertyMapper {
+    if (!_yymodelPropertyMapper) {
+        _yymodelPropertyMapper = [NSMutableDictionary new];
+    }
+    return _yymodelPropertyMapper;
+}
+
 @end
 
 @implementation SKCodeBuilderConfig
@@ -211,6 +307,8 @@
         _rootModelName = @"NSRootModel";
         _modelNamePrefix = @"NS";
         _authorName = @"SKCodeBuilder";
+        _codeType = SKCodeBuilderCodeTypeOC;
+        _jsonType = SKCodeBuilderJSONModelTypeNone;
     }
     return self;
 }

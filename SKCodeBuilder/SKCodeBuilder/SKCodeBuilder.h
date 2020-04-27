@@ -8,6 +8,18 @@
 
 #import <Foundation/Foundation.h>
 
+typedef NS_ENUM(NSInteger, SKCodeBuilderCodeType) {
+    SKCodeBuilderCodeTypeOC = 1,
+    SKCodeBuilderCodeTypeSwift,
+    SKCodeBuilderCodeTypeJava
+};
+
+typedef NS_ENUM(NSInteger, SKCodeBuilderJSONModelType) {
+    SKCodeBuilderJSONModelTypeNone = 0,
+    SKCodeBuilderJSONModelTypeYYModel = 1,
+    SKCodeBuilderJSONModelTypeMJExtension,
+};
+
 @class SKCodeBuilderConfig;
 
 @interface SKCodeBuilder : NSObject
@@ -30,6 +42,10 @@ typedef void (^BuildComplete)(NSMutableString *hString, NSMutableString *mString
 @property (nonatomic, copy) NSString *modelNamePrefix;
 /// authorName  ... default "SKCodeBuilder"
 @property (nonatomic, copy) NSString *authorName;
+/// support OC/Swift/Java   ...default "OC"
+@property (nonatomic, assign) SKCodeBuilderCodeType codeType;
+/// support YYModel/MJExtension/None   ...default "None"
+@property (nonatomic, assign) SKCodeBuilderJSONModelType jsonType;
 
 @end
 

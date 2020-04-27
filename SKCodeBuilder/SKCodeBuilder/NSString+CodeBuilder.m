@@ -10,7 +10,6 @@
 
 #import <AppKit/AppKit.h>
 
-
 @implementation NSString (CodeBuilder)
 
 - (NSDictionary *)_toJsonDict {
@@ -26,6 +25,19 @@
     
     NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingMutableContainers error:nil];
     return jsonDict;
+}
+
+@end
+
+@implementation NSDictionary (CodeBuilder)
+
+- (NSString *)_toJsonString {
+    
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:self options:NSJSONWritingPrettyPrinted error:nil];
+    if (!jsonData) return @"";
+
+    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    return jsonString;
 }
 
 @end
