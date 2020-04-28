@@ -17,6 +17,8 @@ static NSString *const RootModelNameCacheKey = @"RootModelNameCacheKey";
 static NSString *const AuthorNameCacheKey = @"AuthorNameCacheKey";
 static NSString *const BuildCodeTypeCacheKey = @"BuildCodeTypeCacheKey";
 static NSString *const SupportJSONModelTypeCacheKey = @"SupportJSONModelTypeCacheKey";
+static NSString *const ShouldGenerateFileCacheKey = @"ShouldGenerateFileCacheKey";
+static NSString *const GenerateFilePathCacheKey = @"GenerateFilePathCacheKey";
 
 @interface ViewController () <NSTextFieldDelegate>
 {
@@ -37,7 +39,10 @@ static NSString *const SupportJSONModelTypeCacheKey = @"SupportJSONModelTypeCach
 
 @property (weak) IBOutlet NSPopUpButton *codeTypeBtn;
 @property (weak) IBOutlet NSPopUpButton *jsonTypeBtn;
+@property (weak) IBOutlet NSButton *generateFileBtn;
 
+/// outputFilePath
+@property (nonatomic, copy) NSString * outputFilePath;
 @property (nonatomic, strong) SKCodeBuilder *builder;
 
 @end
@@ -90,37 +95,53 @@ static NSString *const SupportJSONModelTypeCacheKey = @"SupportJSONModelTypeCach
     NSDictionary *jsonDict = [jsonString _toJsonDict];
     BOOL isvalid = [NSJSONSerialization isValidJSONObject:jsonDict];
     if (!isvalid) {
-        NSAlert *alert = [[NSAlert alloc] init];
-        [alert setMessageText:@"warn: is not a valid JSON !!!"];
-        [alert setAlertStyle:NSAlertStyleWarning];
-        [alert beginSheetModalForWindow:self.view.window completionHandler:nil];
-        NSLog(@"warn: is not a valid JSON !!!");
+        [self showAlertWithInfo:@"warn: is not a valid JSON !!!"];
         return;
     }
     
     [self saveUserInputContent];
     
+    if (self.generateFileBtn.state == 1) {
+        if (!_outputFilePath || _outputFilePath.length == 0) {
+            [self showAlertWithInfo:@"请选择输出文件路径！"];
+            return;
+        }
+    }
+    
     [self configJsonTextViewWith:jsonString textView:self.jsonTextView color:[NSColor blueColor]];
     __weak typeof(self) weakself = self;
+    
     [self.builder build_OC_withDict:jsonDict complete:^(NSMutableString *hString, NSMutableString *mString) {
         NSColor *color = [NSColor colorWithCalibratedRed:215/255.f green:0/255.f  blue:143/255.f  alpha:1.0];
         [weakself configJsonTextViewWith:hString textView:weakself.hTextView color:color];
         [weakself configJsonTextViewWith:mString textView:weakself.mTextView color:color];
+        if (weakself.generateFileBtn.state == 1) {
+            if (weakself.outputFilePath && weakself.outputFilePath.length) {
+                [self.builder generate_OC_File_withPath:weakself.outputFilePath hString:hString mString:mString complete:nil];
+            }
+        }
     }];
 }
 
-
-- (IBAction)codeTypeBtnSelectItem:(NSPopUpButton *)sender {
-    if (sender.indexOfSelectedItem == 0) { // OC
-        
-    } else { // Swift
-        
-    }
-    NSLog(@"codeTypeBtnSelectItem: %zd",sender.indexOfSelectedItem);
-
+- (void)showAlertWithInfo:(NSString *)info {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setMessageText:info];
+    [alert setAlertStyle:NSAlertStyleWarning];
+    [alert beginSheetModalForWindow:self.view.window completionHandler:nil];
 }
-- (IBAction)jsonTypeBtnSelectItem:(NSPopUpButton *)sender {
-    NSLog(@"jsonTypeBtnSelectItem: %zd",sender.indexOfSelectedItem);
+
+- (IBAction)chooseOutputFilePath:(NSButton *)sender {
+    NSLog(@"chooseOutputFilePath:");
+    NSOpenPanel* openPanel = [NSOpenPanel openPanel];
+    [openPanel setCanChooseFiles:NO];
+    [openPanel setCanChooseDirectories:YES];
+    NSInteger modal = [openPanel runModal];
+    if (modal == NSModalResponseOK){
+        NSURL *files = [[openPanel URLs] objectAtIndex:0];
+        _outputFilePath = files.path;
+        // >>>>  /Users/kun/Desktop/CodeGeneratorResult
+        NSLog(@"chooseOutputFilePath: %@",_outputFilePath);
+    }
 }
 
 /// config textView content on main thred.
@@ -158,6 +179,12 @@ static NSString *const SupportJSONModelTypeCacheKey = @"SupportJSONModelTypeCach
 
     self.builder.config.jsonType = [[NSUserDefaults standardUserDefaults] integerForKey:SupportJSONModelTypeCacheKey];
     [self.jsonTypeBtn selectItemAtIndex:self.builder.config.jsonType];
+    
+    [self.generateFileBtn setState:[[NSUserDefaults standardUserDefaults] boolForKey:ShouldGenerateFileCacheKey]];
+    
+    NSString *outputFilePath = [[NSUserDefaults standardUserDefaults] objectForKey:GenerateFilePathCacheKey];
+    if (outputFilePath) _outputFilePath = outputFilePath;
+
 }
 
 /// save cache
@@ -185,6 +212,8 @@ static NSString *const SupportJSONModelTypeCacheKey = @"SupportJSONModelTypeCach
     self.builder.config.jsonType = self.jsonTypeBtn.indexOfSelectedItem;
     [[NSUserDefaults standardUserDefaults] setInteger:self.builder.config.jsonType forKey:SupportJSONModelTypeCacheKey];
     
+    [[NSUserDefaults standardUserDefaults] setObject:_outputFilePath forKey:GenerateFilePathCacheKey];
+    [[NSUserDefaults standardUserDefaults] setBool:self.generateFileBtn.state forKey:ShouldGenerateFileCacheKey];
 }
 
 /// _currentInputTF width

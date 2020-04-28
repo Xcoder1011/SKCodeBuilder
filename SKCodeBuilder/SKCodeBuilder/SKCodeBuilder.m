@@ -47,6 +47,7 @@
     }
     return self;
 }
+
 - (void)build_OC_withDict:(NSDictionary *)jsonDict complete:(BuildComplete)complete {
     
     NSMutableString *hString = [NSMutableString string];
@@ -92,19 +93,6 @@
     if (complete) {
         complete(hString, mString);
     }
-}
-
-- (NSString *)modelNameWithKey:(NSString *)key
-{
-    NSString *firstCharacter = [key substringToIndex:1];
-    if (firstCharacter) {
-        firstCharacter = [firstCharacter uppercaseString];
-    }
-    key = [key stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:firstCharacter];
-    if (![key hasPrefix:self.config.modelNamePrefix]) {
-        key = [NSString stringWithFormat:@"%@%@",self.config.modelNamePrefix,key];
-    }
-    return [NSString stringWithFormat:@"%@Model",key];
 }
 
 - (void)handleDictValue:(NSDictionary *)dictValue key:(NSString *)key hString:(NSMutableString *)hString mString:(NSMutableString *)mString{
@@ -172,7 +160,7 @@
     if (self.config.jsonType == SKCodeBuilderJSONModelTypeYYModel) { // 适配YYModel
         
         /// The generic class mapper for container properties.
-        
+        BOOL needLineBreak = NO;
         if (self.yymodelPropertyGenericClassDicts.count) {
             [mString appendFormat:@"+ (NSDictionary<NSString *,id> *)modelContainerPropertyGenericClass\n"];
             [mString appendFormat:@"{\n     return @{\n"];
@@ -181,11 +169,15 @@
             }];
             [mString appendFormat:@"                    };"];
             [mString appendFormat:@"\n}\n"];
+            needLineBreak = YES;
         }
         
         /// Custom property mapper.
         
         if (self.yymodelPropertyMapper.count) {
+            if (needLineBreak) {
+                [mString appendFormat:@"\n"];
+            }
             [mString appendFormat:@"+ (nullable NSDictionary<NSString *, id> *)modelCustomPropertyMapper\n"];
             [mString appendFormat:@"{\n     return @{\n"];
             [self.yymodelPropertyMapper enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
@@ -273,6 +265,28 @@
     } else  {
         // int, long, longlong, unsigned int,unsigned longlong 类型
         [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, assign) NSInteger %@;\n",numValue,key];
+    }
+}
+
+- (NSString *)modelNameWithKey:(NSString *)key
+{
+    NSString *firstCharacter = [key substringToIndex:1];
+    if (firstCharacter) {
+        firstCharacter = [firstCharacter uppercaseString];
+    }
+    key = [key stringByReplacingCharactersInRange:NSMakeRange(0, 1) withString:firstCharacter];
+    if (![key hasPrefix:self.config.modelNamePrefix]) {
+        key = [NSString stringWithFormat:@"%@%@",self.config.modelNamePrefix,key];
+    }
+    return [NSString stringWithFormat:@"%@Model",key];
+}
+
+- (void)generate_OC_File_withPath:(NSString *)filePath
+                          hString:(NSMutableString *)hString
+                          mString:(NSMutableString *)mString
+                         complete:(GenerateFileComplete)complete {
+    if (hString.length && mString.length) {
+
     }
 }
 
