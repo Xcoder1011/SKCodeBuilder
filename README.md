@@ -1,7 +1,6 @@
 
 # SKCodeBuilder
 
-![photo1.png](https://upload-images.jianshu.io/upload_images/1129777-cf955d251053c767.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 - 支持通过URL链接或json字符串一键生成model文件
 - 支持自定义model父类、自定义model前缀、自定义文件名、自定义作者名
@@ -17,4 +16,5 @@
 - Compatible with YYModel / MJExtension analysis
 - Compatible server returns "id" field
 
-![photo1.png](https://github.com/Xcoder1011/SKCodeBuilder/Resource/photo1.png)
+![photo1.png](https://upload-images.jianshu.io/upload_images/1129777-cf955d251053c767.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
