@@ -16,5 +16,5 @@
 - Compatible with YYModel / MJExtension analysis
 - Compatible server returns "id" field
 
-![preview.gif](https://upload-images.jianshu.io/upload_images/1129777-99e33be427d6e490.gif?imageMogr2/auto-orient/strip)
+![photo1.png](https://upload-images.jianshu.io/upload_images/1129777-cf955d251053c767.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
