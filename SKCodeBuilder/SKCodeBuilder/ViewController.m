@@ -95,43 +95,36 @@ static NSString *const GenerateFilePathCacheKey = @"GenerateFilePathCacheKey";
     NSDictionary *jsonDict = [jsonString _toJsonDict];
     BOOL isvalid = [NSJSONSerialization isValidJSONObject:jsonDict];
     if (!isvalid) {
-        [self showAlertWithInfo:@"warn: is not a valid JSON !!!"];
+        [self showAlertWithInfo:@"warn: is not a valid JSON !!!" style:NSAlertStyleWarning];
         return;
     }
-    
     [self saveUserInputContent];
-    
-    if (self.generateFileBtn.state == 1) {
-        if (!_outputFilePath || _outputFilePath.length == 0) {
-            [self showAlertWithInfo:@"请选择输出文件路径！"];
-            return;
-        }
-    }
-    
     [self configJsonTextViewWith:jsonString textView:self.jsonTextView color:[NSColor blueColor]];
     __weak typeof(self) weakself = self;
-    
     [self.builder build_OC_withDict:jsonDict complete:^(NSMutableString *hString, NSMutableString *mString) {
         NSColor *color = [NSColor colorWithCalibratedRed:215/255.f green:0/255.f  blue:143/255.f  alpha:1.0];
         [weakself configJsonTextViewWith:hString textView:weakself.hTextView color:color];
         [weakself configJsonTextViewWith:mString textView:weakself.mTextView color:color];
         if (weakself.generateFileBtn.state == 1) {
-            if (weakself.outputFilePath && weakself.outputFilePath.length) {
-                [self.builder generate_OC_File_withPath:weakself.outputFilePath hString:hString mString:mString complete:nil];
-            }
+            [self.builder generate_OC_File_withPath:weakself.outputFilePath hString:hString mString:mString complete:^(BOOL success, NSString *filePath) {
+                if (success) {
+                    [self showAlertWithInfo:[NSString stringWithFormat:@"生成文件路径在：%@",filePath] style:NSAlertStyleInformational];
+                    weakself.outputFilePath = filePath;
+                    [weakself saveUserInputContent];
+                }
+            }];
         }
     }];
 }
 
-- (void)showAlertWithInfo:(NSString *)info {
+- (void)showAlertWithInfo:(NSString *)info style:(NSAlertStyle)style{
     NSAlert *alert = [[NSAlert alloc] init];
     [alert setMessageText:info];
-    [alert setAlertStyle:NSAlertStyleWarning];
+    [alert setAlertStyle:style];
     [alert beginSheetModalForWindow:self.view.window completionHandler:nil];
 }
 
 - (IBAction)chooseOutputFilePath:(NSButton *)sender {
-    NSLog(@"chooseOutputFilePath:");
     NSOpenPanel* openPanel = [NSOpenPanel openPanel];
     [openPanel setCanChooseFiles:NO];
     [openPanel setCanChooseDirectories:YES];
@@ -139,7 +132,6 @@ static NSString *const GenerateFilePathCacheKey = @"GenerateFilePathCacheKey";
     if (modal == NSModalResponseOK){
         NSURL *files = [[openPanel URLs] objectAtIndex:0];
         _outputFilePath = files.path;
-        // >>>>  /Users/kun/Desktop/CodeGeneratorResult
         NSLog(@"chooseOutputFilePath: %@",_outputFilePath);
     }
 }

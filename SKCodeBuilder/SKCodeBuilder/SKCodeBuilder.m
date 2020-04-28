@@ -247,8 +247,8 @@
 }
 
 - (void)handleNumberValue:(NSNumber *)numValue key:(NSString *)key hString:(NSMutableString *)hString {
-    
-    const char *type = @encode(__typeof__(numValue));
+        
+    const char *type = [numValue objCType];
     
     if (strcmp(type, @encode(char)) == 0 || strcmp(type, @encode(unsigned char)) == 0) {
         // char 字符串
@@ -286,7 +286,30 @@
                           mString:(NSMutableString *)mString
                          complete:(GenerateFileComplete)complete {
     if (hString.length && mString.length) {
-
+        
+        if (!filePath) {
+            NSString *path = NSSearchPathForDirectoriesInDomains(NSDesktopDirectory, NSUserDomainMask, YES).lastObject;
+            path = [path stringByAppendingPathComponent:@"SKCodeBuilderModelFiles"];
+            NSLog(@"path = %@",path);
+            BOOL isDir = NO;
+            BOOL isExists = [[NSFileManager defaultManager] fileExistsAtPath:path isDirectory:&isDir];
+            if (isExists && isDir) {
+                filePath = path;
+            } else {
+                if ([[NSFileManager defaultManager] createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil]) {
+                    filePath = path;
+                }
+            }
+        }
+        
+        NSString *fileNameH = [filePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.h",self.config.rootModelName]];
+        NSString *fileNameM = [filePath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.m",self.config.rootModelName]];
+        BOOL retH = [hString writeToFile:fileNameH atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        BOOL retM = [mString writeToFile:fileNameM atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        
+        if (complete) {
+            complete(retH&&retM, filePath);
+        }
     }
 }
 

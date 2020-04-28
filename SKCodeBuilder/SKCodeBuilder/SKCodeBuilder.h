@@ -26,7 +26,7 @@ typedef NS_ENUM(NSInteger, SKCodeBuilderJSONModelType) {
 
 typedef void (^BuildComplete)(NSMutableString *hString, NSMutableString *mString);
 
-typedef void (^GenerateFileComplete)(BOOL success);
+typedef void (^GenerateFileComplete)(BOOL success, NSString *filePath);
 
 @property (nonatomic, strong) SKCodeBuilderConfig *config;
 
