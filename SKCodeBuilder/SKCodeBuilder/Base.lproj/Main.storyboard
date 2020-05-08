@@ -1039,6 +1039,7 @@
                         <outlet property="codeTypeBtn" destination="HnU-sE-A1B" id="ogb-ch-ZqL"/>
                         <outlet property="generateFileBtn" destination="Zjs-hj-b2B" id="ivd-8e-DPn"/>
                         <outlet property="hTextView" destination="LI7-4D-S7A" id="3Au-Fw-zDP"/>
+                        <outlet property="hTextViewHeightPriority" destination="JAv-qO-7rJ" id="Vt1-Js-zBV"/>
                         <outlet property="jsonTextView" destination="NlK-m7-eFH" id="4jy-ge-eux"/>
                         <outlet property="jsonTypeBtn" destination="KhJ-UP-xRv" id="fpM-wi-5bp"/>
                         <outlet property="mTextView" destination="Buo-of-aW0" id="U0f-jV-sDB"/>

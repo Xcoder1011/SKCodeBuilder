@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		BC063BB0244FF0F90009C4E7 /* NSString+CodeBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = BC063BAF244FF0F90009C4E7 /* NSString+CodeBuilder.m */; };
 		BC063BB3244FF40F0009C4E7 /* SKCodeBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = BC063BB2244FF40F0009C4E7 /* SKCodeBuilder.m */; };
+		BC78816E2463F6E9004BFC68 /* SKCodeBuilder+Swift.m in Sources */ = {isa = PBXBuildFile; fileRef = BC78816D2463F6E9004BFC68 /* SKCodeBuilder+Swift.m */; };
 		BC7AD139243DB64F009ADE2F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = BC7AD138243DB64F009ADE2F /* AppDelegate.m */; };
 		BC7AD13C243DB64F009ADE2F /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BC7AD13B243DB64F009ADE2F /* ViewController.m */; };
 		BC7AD13E243DB650009ADE2F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BC7AD13D243DB650009ADE2F /* Assets.xcassets */; };
@@ -22,6 +23,8 @@
 		BC063BAF244FF0F90009C4E7 /* NSString+CodeBuilder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+CodeBuilder.m"; sourceTree = "<group>"; };
 		BC063BB1244FF40F0009C4E7 /* SKCodeBuilder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SKCodeBuilder.h; sourceTree = "<group>"; };
 		BC063BB2244FF40F0009C4E7 /* SKCodeBuilder.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SKCodeBuilder.m; sourceTree = "<group>"; };
+		BC78816C2463F6E9004BFC68 /* SKCodeBuilder+Swift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SKCodeBuilder+Swift.h"; sourceTree = "<group>"; };
+		BC78816D2463F6E9004BFC68 /* SKCodeBuilder+Swift.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "SKCodeBuilder+Swift.m"; sourceTree = "<group>"; };
 		BC7AD134243DB64F009ADE2F /* SKCodeBuilder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SKCodeBuilder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC7AD137243DB64F009ADE2F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		BC7AD138243DB64F009ADE2F /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -72,6 +75,8 @@
 				BC7AD13B243DB64F009ADE2F /* ViewController.m */,
 				BC063BB1244FF40F0009C4E7 /* SKCodeBuilder.h */,
 				BC063BB2244FF40F0009C4E7 /* SKCodeBuilder.m */,
+				BC78816C2463F6E9004BFC68 /* SKCodeBuilder+Swift.h */,
+				BC78816D2463F6E9004BFC68 /* SKCodeBuilder+Swift.m */,
 				BC063BAE244FF0F90009C4E7 /* NSString+CodeBuilder.h */,
 				BC063BAF244FF0F90009C4E7 /* NSString+CodeBuilder.m */,
 				BC9A94082457F513009B9A27 /* ExampleModel.h */,
@@ -158,6 +163,7 @@
 				BC7AD13C243DB64F009ADE2F /* ViewController.m in Sources */,
 				BC7AD144243DB650009ADE2F /* main.m in Sources */,
 				BC9A940A2457F513009B9A27 /* ExampleModel.m in Sources */,
+				BC78816E2463F6E9004BFC68 /* SKCodeBuilder+Swift.m in Sources */,
 				BC063BB0244FF0F90009C4E7 /* NSString+CodeBuilder.m in Sources */,
 				BC7AD139243DB64F009ADE2F /* AppDelegate.m in Sources */,
 			);

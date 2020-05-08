@@ -8,10 +8,12 @@
 
 #import "SKCodeBuilder.h"
 #import "NSString+CodeBuilder.h"
+#import "SKCodeBuilder+Swift.h"
 
 @interface SKCodeBuilder ()
+
 /// 接下来需要处理的 字典 key - value
-@property (nonatomic, strong) NSMutableDictionary *handleDicts;
+// @property (nonatomic, strong) NSMutableDictionary *handleDicts;
 
 /*
  *  + (NSDictionary<NSString *,id> *)modelContainerPropertyGenericClass
@@ -48,12 +50,12 @@
     return self;
 }
 
-- (void)build_OC_withDict:(NSDictionary *)jsonDict complete:(BuildComplete)complete {
+- (void)build_OC_withJsonObj:(id)jsonObj complete:(BuildComplete)complete {
     
     NSMutableString *hString = [NSMutableString string];
     NSMutableString *mString = [NSMutableString string];
 
-    [self handleDictValue:jsonDict key:@"" hString:hString mString:mString];
+    [self handleDictValue:jsonObj key:@"" hString:hString mString:mString];
     
     if ([self.config.superClassName isEqualToString:@"NSObject"]) { // 默认
         [hString insertString:@"\n#import <Foundation/Foundation.h>\n\n" atIndex:0];
@@ -106,54 +108,59 @@
 
     } else { // Root model
         [hString appendFormat:@"\n\n@interface %@ : %@\n\n", self.config.rootModelName ,self.config.superClassName];
-        
         [mString appendFormat:@"\n\n@implementation %@\n\n", self.config.rootModelName];
     }
     
-    if (![dictValue isKindOfClass:[NSDictionary class]]) {
+    if ([dictValue isKindOfClass:[NSArray class]]) {
+        
+        [self handleArrayValue:(NSArray *)dictValue key:@"dataList" hString:hString];
+        
+    } else if ([dictValue isKindOfClass:[NSDictionary class]])  {
+        
+        [dictValue enumerateKeysAndObjectsUsingBlock:^(NSString *  _Nonnull key, id  _Nonnull value, BOOL * _Nonnull stop) {
+            
+            if ([value isKindOfClass:[NSNumber class]]) {
+                // NSNumber 类型
+                [self handleNumberValue:value key:key hString:hString];
+                
+            } else if ([value isKindOfClass:[NSString class]]) {
+                // NSString 类型
+                if ([(NSString *)value length] > 12) {
+                    [hString appendFormat:@"/** %@ */\n@property (nonatomic, copy) NSString *%@;\n",key, key];
+                } else {
+                    if (self.config.jsonType == SKCodeBuilderJSONModelTypeNone) {
+                        [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, copy) NSString *%@;\n",value,key];
+                    } else {
+                        [self handleIdValue:value key:key hString:hString];
+                    }
+                }
+                
+            } else if ([value isKindOfClass:[NSDictionary class]]) {
+                // NSDictionary 类型
+                NSString *modelName = [self modelNameWithKey:key];
+                [hString appendFormat:@"/** %@ */\n@property (nonatomic, strong) %@ *%@;\n",key, modelName, key];\
+                
+                NSString *propertyValue = [NSString stringWithFormat:@"%@", modelName];
+                [self.yymodelPropertyGenericClassDicts setObject:propertyValue forKey:key];
+                
+                [self.handleDicts setObject:value forKey:key];
+                
+            } else if ([value isKindOfClass:[NSArray class]]) {
+                // NSArray 类型
+                [self handleArrayValue:(NSArray *)value key:key hString:hString];
+                
+            } else {
+                // 识别不出类型
+                [hString appendFormat:@"/** <#识别不出类型#> */\n@property (nonatomic, strong) id %@;\n",key];
+            }
+        }];
+        
+    } else {
         [hString appendFormat:@"\n@end\n\n"];
         [mString appendFormat:@"\n@end\n\n"];
         NSLog(@" handleDictValue (%@) error !!!!!!",dictValue);
         return;
     }
-    
-    [dictValue enumerateKeysAndObjectsUsingBlock:^(NSString *  _Nonnull key, id  _Nonnull value, BOOL * _Nonnull stop) {
-        
-        if ([value isKindOfClass:[NSNumber class]]) {
-            // NSNumber 类型
-            [self handleNumberValue:value key:key hString:hString];
-            
-        } else if ([value isKindOfClass:[NSString class]]) {
-            // NSString 类型
-            if ([(NSString *)value length] > 12) {
-                [hString appendFormat:@"/** %@ */\n@property (nonatomic, copy) NSString *%@;\n",key, key];
-            } else {
-                if (self.config.jsonType == SKCodeBuilderJSONModelTypeNone) {
-                    [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, copy) NSString *%@;\n",value,key];
-                } else {
-                    [self handleIdValue:value key:key hString:hString];
-                }
-            }
-            
-        } else if ([value isKindOfClass:[NSDictionary class]]) {
-            // NSDictionary 类型
-            NSString *modelName = [self modelNameWithKey:key];
-            [hString appendFormat:@"/** %@ */\n@property (nonatomic, strong) %@ *%@;\n",key, modelName, key];\
-            
-            NSString *propertyValue = [NSString stringWithFormat:@"%@", modelName];
-            [self.yymodelPropertyGenericClassDicts setObject:propertyValue forKey:key];
-            
-            [self.handleDicts setObject:value forKey:key];
-            
-        } else if ([value isKindOfClass:[NSArray class]]) {
-            // NSArray 类型
-            [self handleArrayValue:(NSArray *)value key:key hString:hString];
-            
-        } else {
-            // 识别不出类型
-            [hString appendFormat:@"/** <#识别不出类型#> */\n@property (nonatomic, strong) id %@;\n",key];
-        }
-    }];
     
     [hString appendFormat:@"\n@end\n\n"];
 
@@ -247,20 +254,20 @@
 }
 
 - (void)handleNumberValue:(NSNumber *)numValue key:(NSString *)key hString:(NSMutableString *)hString {
-        
+    
     const char *type = [numValue objCType];
     
-    if (strcmp(type, @encode(char)) == 0 || strcmp(type, @encode(unsigned char)) == 0) {
+    if (strcmp(type, @encode(double)) == 0 || strcmp(type, @encode(float)) == 0) {
+        // 浮点型
+        [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, assign) CGFloat %@;\n",numValue,key];
+        
+    } else if (strcmp(type, @encode(BOOL)) == 0) {
+        // 布尔值类型
+        [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, assign) BOOL %@;\n",numValue,key];
+        
+    } else if (strcmp(type, @encode(char)) == 0 || strcmp(type, @encode(unsigned char)) == 0) {
         // char 字符串
         [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, copy) NSString *%@;\n",numValue,key];
-        
-    } else if (strcmp(type, @encode(double)) == 0 || strcmp(type, @encode(float)) == 0) {
-         // 浮点型
-        [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, assign) CGFloat %@;\n",numValue,key];
-    
-    } else if (strcmp(type, @encode(BOOL)) == 0) {
-         // 布尔值类型
-        [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, assign) BOOL %@;\n",numValue,key];
         
     } else  {
         // int, long, longlong, unsigned int,unsigned longlong 类型
@@ -311,13 +318,6 @@
             complete(retH&&retM, filePath);
         }
     }
-}
-
-- (NSMutableDictionary *)handleDicts {
-    if (!_handleDicts) {
-        _handleDicts = [NSMutableDictionary new];
-    }
-    return _handleDicts;
 }
 
 - (NSMutableDictionary *)yymodelPropertyGenericClassDicts {

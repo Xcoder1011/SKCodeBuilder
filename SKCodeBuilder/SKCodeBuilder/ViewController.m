@@ -8,7 +8,9 @@
 
 #import "ViewController.h"
 #import "NSString+CodeBuilder.h"
-#import "SKCodeBuilder.h"
+//#import "SKCodeBuilder.h"
+
+#import "SKCodeBuilder+Swift.h"
 
 static NSString *const LastInputURLCacheKey = @"LastInputURLCacheKey";
 static NSString *const SuperClassNameCacheKey = @"SuperClassNameCacheKey";
@@ -31,6 +33,8 @@ static NSString *const GenerateFilePathCacheKey = @"GenerateFilePathCacheKey";
 @property (unsafe_unretained) IBOutlet NSTextView *jsonTextView;
 @property (unsafe_unretained) IBOutlet NSTextView *hTextView;
 @property (unsafe_unretained) IBOutlet NSTextView *mTextView;
+/// default 3:5
+@property (weak) IBOutlet NSLayoutConstraint *hTextViewHeightPriority;
 
 @property (weak) IBOutlet NSTextField *superClassNameTF;
 @property (weak) IBOutlet NSTextField *modelNamePrefixTF;
@@ -99,29 +103,46 @@ static NSString *const GenerateFilePathCacheKey = @"GenerateFilePathCacheKey";
         return;
     }
     [self saveUserInputContent];
+    
+    NSData *formatJsonData = [NSJSONSerialization dataWithJSONObject:jsonDict options:NSJSONWritingPrettyPrinted error:nil];
+    jsonString = [[NSString alloc] initWithData:formatJsonData encoding:NSUTF8StringEncoding];
     [self configJsonTextViewWith:jsonString textView:self.jsonTextView color:[NSColor blueColor]];
+    
     __weak typeof(self) weakself = self;
-    [self.builder build_OC_withDict:jsonDict complete:^(NSMutableString *hString, NSMutableString *mString) {
-        NSColor *color = [NSColor colorWithCalibratedRed:215/255.f green:0/255.f  blue:143/255.f  alpha:1.0];
-        [weakself configJsonTextViewWith:hString textView:weakself.hTextView color:color];
-        [weakself configJsonTextViewWith:mString textView:weakself.mTextView color:color];
-        if (weakself.generateFileBtn.state == 1) {
-            [self.builder generate_OC_File_withPath:weakself.outputFilePath hString:hString mString:mString complete:^(BOOL success, NSString *filePath) {
-                if (success) {
-                    [self showAlertWithInfo:[NSString stringWithFormat:@"生成文件路径在：%@",filePath] style:NSAlertStyleInformational];
-                    weakself.outputFilePath = filePath;
-                    [weakself saveUserInputContent];
-                }
-            }];
-        }
-    }];
-}
-
-- (void)showAlertWithInfo:(NSString *)info style:(NSAlertStyle)style{
-    NSAlert *alert = [[NSAlert alloc] init];
-    [alert setMessageText:info];
-    [alert setAlertStyle:style];
-    [alert beginSheetModalForWindow:self.view.window completionHandler:nil];
+    
+    if (self.builder.config.codeType ==SKCodeBuilderCodeTypeSwift) {
+        [self.builder build_Swift_withJsonObj:jsonDict complete:^(NSMutableString *swiftStr, NSMutableString *swiftStr2) {
+            weakself.hTextViewHeightPriority = [weakself modifyConstraint:weakself.hTextViewHeightPriority multiplier:1.0];
+            NSColor *color = [NSColor colorWithCalibratedRed:215/255.f green:0/255.f  blue:143/255.f  alpha:1.0];
+            [weakself configJsonTextViewWith:swiftStr textView:weakself.hTextView color:color];
+            if (weakself.generateFileBtn.state == 1) {
+                [weakself.builder generate_Swift_File_withPath:weakself.outputFilePath swiftString:swiftStr complete:^(BOOL success, NSString *filePath) {
+                    if (success) {
+                        [weakself showAlertWithInfo:[NSString stringWithFormat:@"生成文件路径在：%@",filePath] style:NSAlertStyleInformational];
+                        weakself.outputFilePath = filePath;
+                        [weakself saveUserInputContent];
+                    }
+                }];
+            }
+        }];
+        
+    } else if (self.builder.config.codeType ==SKCodeBuilderCodeTypeOC) {
+        [self.builder build_OC_withJsonObj:jsonDict complete:^(NSMutableString *hString, NSMutableString *mString) {
+            weakself.hTextViewHeightPriority = [weakself modifyConstraint:weakself.hTextViewHeightPriority multiplier:3/5.0];
+            NSColor *color = [NSColor colorWithCalibratedRed:215/255.f green:0/255.f  blue:143/255.f  alpha:1.0];
+            [weakself configJsonTextViewWith:hString textView:weakself.hTextView color:color];
+            [weakself configJsonTextViewWith:mString textView:weakself.mTextView color:color];
+            if (weakself.generateFileBtn.state == 1) {
+                [weakself.builder generate_OC_File_withPath:weakself.outputFilePath hString:hString mString:mString complete:^(BOOL success, NSString *filePath) {
+                    if (success) {
+                        [weakself showAlertWithInfo:[NSString stringWithFormat:@"生成文件路径在：%@",filePath] style:NSAlertStyleInformational];
+                        weakself.outputFilePath = filePath;
+                        [weakself saveUserInputContent];
+                    }
+                }];
+            }
+        }];
+    }
 }
 
 - (IBAction)chooseOutputFilePath:(NSButton *)sender {
@@ -146,6 +167,24 @@ static NSString *const GenerateFilePathCacheKey = @"GenerateFilePathCacheKey";
         [textView.textStorage setFont:[NSFont systemFontOfSize:15]];
         [textView.textStorage setForegroundColor:color];
     });
+}
+
+/// modify a constraint‘s multiplier
+- (NSLayoutConstraint *)modifyConstraint:(NSLayoutConstraint *)constraint multiplier:(CGFloat)multiplier {
+    [NSLayoutConstraint deactivateConstraints:@[constraint]];
+    NSLayoutConstraint *newConstraint = [NSLayoutConstraint constraintWithItem:constraint.firstItem attribute:constraint.firstAttribute relatedBy:constraint.relation toItem:constraint.secondItem attribute:constraint.secondAttribute multiplier:multiplier constant:0];
+    newConstraint.identifier = constraint.identifier;
+    newConstraint.priority = constraint.priority;
+    newConstraint.shouldBeArchived = constraint.shouldBeArchived;
+    [NSLayoutConstraint activateConstraints:@[newConstraint]];
+    return newConstraint;
+}
+
+- (void)showAlertWithInfo:(NSString *)info style:(NSAlertStyle)style{
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setMessageText:info];
+    [alert setAlertStyle:style];
+    [alert beginSheetModalForWindow:self.view.window completionHandler:nil];
 }
 
 /// load cache

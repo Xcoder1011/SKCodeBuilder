@@ -24,13 +24,13 @@ typedef NS_ENUM(NSInteger, SKCodeBuilderJSONModelType) {
 
 @interface SKCodeBuilder : NSObject
 
-typedef void (^BuildComplete)(NSMutableString *hString, NSMutableString *mString);
+typedef void (^BuildComplete)(NSMutableString *, NSMutableString *);
 
 typedef void (^GenerateFileComplete)(BOOL success, NSString *filePath);
 
 @property (nonatomic, strong) SKCodeBuilderConfig *config;
 
-- (void)build_OC_withDict:(NSDictionary *)jsonDict complete:(BuildComplete)complete;
+- (void)build_OC_withJsonObj:(id)jsonObj complete:(BuildComplete)complete;
 
 - (void)generate_OC_File_withPath:(NSString *)filePath
                           hString:(NSMutableString *)hString
