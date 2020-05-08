@@ -15,6 +15,8 @@
 /// 接下来需要处理的 字典 key - value
 @property (nonatomic, strong) NSMutableDictionary *handleDicts;
 
+@property (nonatomic, strong) NSMutableDictionary *handlePropertyMapper;
+
 - (void)build_Swift_withJsonObj:(id)jsonObj complete:(BuildComplete)complete;
 
 - (void)generate_Swift_File_withPath:(NSString *)filePath

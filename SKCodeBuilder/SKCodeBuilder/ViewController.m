@@ -63,6 +63,10 @@ static NSString *const GenerateFilePathCacheKey = @"GenerateFilePathCacheKey";
     [self.codeTypeBtn removeAllItems];
     [self.codeTypeBtn addItemsWithTitles:@[@"Objective-C",@"Swift"]];
     [self.codeTypeBtn selectItemAtIndex:0];
+    
+    [self.jsonTypeBtn removeAllItems];
+    [self.jsonTypeBtn addItemsWithTitles:@[@"None",@"YYMode",@"MJExtension",@"HandyJSON"]];
+    [self.jsonTypeBtn selectItemAtIndex:0];
 }
 
 - (void)viewDidAppear {
@@ -242,6 +246,14 @@ static NSString *const GenerateFilePathCacheKey = @"GenerateFilePathCacheKey";
 
     self.builder.config.jsonType = self.jsonTypeBtn.indexOfSelectedItem;
     [[NSUserDefaults standardUserDefaults] setInteger:self.builder.config.jsonType forKey:SupportJSONModelTypeCacheKey];
+    
+    if ([self.builder.config.superClassName isEqualToString:@"NSObject"]) {
+        if (self.builder.config.jsonType == SKCodeBuilderJSONModelTypeHandyJSON) {
+            self.builder.config.superClassName = @"HandyJSON";
+        } else if (self.builder.config.jsonType == SKCodeBuilderJSONModelTypeYYModel) {
+            self.builder.config.superClassName = @"YYModel";
+        }
+    }
     
     [[NSUserDefaults standardUserDefaults] setObject:_outputFilePath forKey:GenerateFilePathCacheKey];
     [[NSUserDefaults standardUserDefaults] setBool:self.generateFileBtn.state forKey:ShouldGenerateFileCacheKey];

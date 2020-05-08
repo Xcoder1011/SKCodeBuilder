@@ -13,12 +13,17 @@
 @implementation SKCodeBuilder (Swift)
 
 static const char *sk_handleDictsKey = "sk_handleDictsKey";
+static const char *sk_handlePropertyMapperKey = "sk_handlePropertyMapperKey";
 
 - (void)build_Swift_withJsonObj:(id)jsonObj complete:(BuildComplete)complete {
     
     NSMutableString *swiftString = [NSMutableString string];
     
     [self handleDictValue:jsonObj key:@"" swiftString:swiftString];
+    
+    if (self.config.jsonType == SKCodeBuilderJSONModelTypeHandyJSON) {
+        [swiftString insertString:@"import HandyJSON" atIndex:0];
+    }
     
     [swiftString insertString:@"\nimport Foundation\n" atIndex:0];
     
@@ -68,16 +73,8 @@ static const char *sk_handleDictsKey = "sk_handleDictsKey";
                 
             } else if ([value isKindOfClass:[NSString class]]) {
                 // NSString 类型
-                if ([(NSString *)value length] > 12) {
-                    [swiftString appendFormat:@"    /// %@\n    var %@: String?\n",key, key];
-                } else {
-                    if (self.config.jsonType == SKCodeBuilderJSONModelTypeNone) {
-                        [swiftString appendFormat:@"    /// %@\n    var %@: String?\n",value, key];
-
-                    } else {
-                        [self handleIdValue:value key:key swiftString:swiftString];
-                    }
-                }
+                
+                [self handleIdValue:value key:key swiftString:swiftString ignoreIdValue:self.config.jsonType == SKCodeBuilderJSONModelTypeNone];
                 
             } else if ([value isKindOfClass:[NSDictionary class]]) {
                 // NSDictionary 类型
@@ -98,16 +95,35 @@ static const char *sk_handleDictsKey = "sk_handleDictsKey";
         }];
         
     } else {
-        [swiftString appendFormat:@"\n}\n\n"];
+        [swiftString appendFormat:@"}\n"];
         NSLog(@" handleDictValue (%@) error !!!!!!",dictValue);
         return;
     }
     
-    [swiftString appendFormat:@"\n}\n\n"];
+    if (self.config.jsonType == SKCodeBuilderJSONModelTypeHandyJSON) {
+        
+        /// 1. implement an empty initializer.
+        [swiftString appendFormat:@"\n    required init() {}\n"];
+        
+        /// 2. Custom property mapper.
+        
+        if (self.handlePropertyMapper.count) {
+          
+            [swiftString appendFormat:@"\n    public func mapping(mapper: HelpingMapper) {\n"];
+            
+            [self.handlePropertyMapper enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+                [swiftString appendFormat:@"\n        mapper <<< self.%@ <-- \"%@\"",key,obj];
+            }];
+            [swiftString appendFormat:@"\n\n     }\n"];
+        }
+    }
+    
+    [swiftString appendFormat:@"}\n"];
 
     if (key.length) {
         [self.handleDicts removeObjectForKey:key];
     }
+    [self.handlePropertyMapper removeAllObjects];
 
     if (self.handleDicts.count) {
         NSString *firstKey = self.handleDicts.allKeys.firstObject;
@@ -119,10 +135,32 @@ static const char *sk_handleDictsKey = "sk_handleDictsKey";
 - (void)handleIdValue:(NSString *)idValue key:(NSString *)key swiftString:(NSMutableString *)swiftString {
     // 字符串id 替换成 itemId
     if ([key isEqualToString:@"id"]) {
-        //[self.yymodelPropertyMapper setObject:@"id" forKey:@"itemId"];
+        [self.handlePropertyMapper setObject:@"id" forKey:@"itemId"];
         [swiftString appendFormat:@"    /// %@\n    var %@: String?\n",idValue, @"itemId"];
     } else {
         [swiftString appendFormat:@"    /// %@\n    var %@: String?\n",idValue, key];
+    }
+}
+
+- (void)handleIdValue:(NSString *)idValue key:(NSString *)key swiftString:(NSMutableString *)swiftString ignoreIdValue:(BOOL)ignoreIdValue {
+    
+    void (^handleString)(NSString *, NSString *, NSMutableString *) = ^(NSString *idValue, NSString *key, NSMutableString *hString){
+        if ([(NSString *)idValue length] > 12) {
+            [swiftString appendFormat:@"    /// %@\n    var %@: String?\n",key, key];
+        } else {
+            [swiftString appendFormat:@"    /// %@\n    var %@: String?\n",idValue, key];
+        }
+    };
+    
+    if (ignoreIdValue) { // 忽略id，不处理
+        handleString(idValue, key, swiftString);
+    } else {
+        if ([key isEqualToString:@"id"]) { // 字符串id 替换成 itemId
+            [self.handlePropertyMapper setObject:@"id" forKey:@"itemId"];
+            [swiftString appendFormat:@"    /// %@\n    var %@: String?\n",idValue, @"itemId"];
+        } else {
+            handleString(idValue, key, swiftString);
+        }
     }
 }
 
@@ -216,7 +254,6 @@ static const char *sk_handleDictsKey = "sk_handleDictsKey";
     }
 }
 
-
 - (NSMutableDictionary *)handleDicts {
     NSMutableDictionary *dicts = objc_getAssociatedObject(self, sk_handleDictsKey);
     if (!dicts) {
@@ -227,7 +264,20 @@ static const char *sk_handleDictsKey = "sk_handleDictsKey";
 }
 
 - (void)setHandleDicts:(NSMutableDictionary *)handleDicts {
-    objc_setAssociatedObject(self, @selector(handleDicts), handleDicts, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, sk_handleDictsKey, handleDicts, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (NSMutableDictionary *)handlePropertyMapper {
+    NSMutableDictionary *dicts = objc_getAssociatedObject(self, sk_handlePropertyMapperKey);
+    if (!dicts) {
+        dicts = [NSMutableDictionary new];
+        objc_setAssociatedObject(self, sk_handlePropertyMapperKey, dicts, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    }
+    return dicts;
+}
+
+- (void)setHandlePropertyMapper:(NSMutableDictionary *)handlePropertyMapper {
+    objc_setAssociatedObject(self, sk_handlePropertyMapperKey, handlePropertyMapper, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
 @end

@@ -16,8 +16,9 @@ typedef NS_ENUM(NSInteger, SKCodeBuilderCodeType) {
 
 typedef NS_ENUM(NSInteger, SKCodeBuilderJSONModelType) {
     SKCodeBuilderJSONModelTypeNone = 0,
-    SKCodeBuilderJSONModelTypeYYModel = 1,
+    SKCodeBuilderJSONModelTypeYYModel,
     SKCodeBuilderJSONModelTypeMJExtension,
+    SKCodeBuilderJSONModelTypeHandyJSON,
 };
 
 @class SKCodeBuilderConfig;
