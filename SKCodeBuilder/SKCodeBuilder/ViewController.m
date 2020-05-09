@@ -7,10 +7,8 @@
 //
 
 #import "ViewController.h"
-#import "NSString+CodeBuilder.h"
-//#import "SKCodeBuilder.h"
 
-#import "SKCodeBuilder+Swift.h"
+#import "SKCodeBuilder/SKCodeBuilderHeader.h"
 
 static NSString *const LastInputURLCacheKey = @"LastInputURLCacheKey";
 static NSString *const SuperClassNameCacheKey = @"SuperClassNameCacheKey";
@@ -67,6 +65,7 @@ static NSString *const GenerateFilePathCacheKey = @"GenerateFilePathCacheKey";
     [self.jsonTypeBtn removeAllItems];
     [self.jsonTypeBtn addItemsWithTitles:@[@"None",@"YYMode",@"MJExtension",@"HandyJSON"]];
     [self.jsonTypeBtn selectItemAtIndex:0];
+
 }
 
 - (void)viewDidAppear {

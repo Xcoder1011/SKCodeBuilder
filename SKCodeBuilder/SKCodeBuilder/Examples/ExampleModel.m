@@ -43,3 +43,9 @@
 
 @end
 
+
+
+@implementation YYModel
+
+
+@end

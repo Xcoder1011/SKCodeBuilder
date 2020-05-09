@@ -109,3 +109,9 @@
 
 @end
 
+
+
+@interface YYModel : NSObject
+
+@end
+

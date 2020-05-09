@@ -69,11 +69,10 @@ static const char *sk_handlePropertyMapperKey = "sk_handlePropertyMapperKey";
             
             if ([value isKindOfClass:[NSNumber class]]) {
                 // NSNumber 类型
-                [self handleNumberValue:value key:key swiftString:swiftString];
+                [self handleIdNumberValue:value key:key swiftString:swiftString ignoreIdValue:self.config.jsonType == SKCodeBuilderJSONModelTypeNone];
                 
             } else if ([value isKindOfClass:[NSString class]]) {
                 // NSString 类型
-                
                 [self handleIdValue:value key:key swiftString:swiftString ignoreIdValue:self.config.jsonType == SKCodeBuilderJSONModelTypeNone];
                 
             } else if ([value isKindOfClass:[NSDictionary class]]) {
@@ -90,7 +89,6 @@ static const char *sk_handlePropertyMapperKey = "sk_handlePropertyMapperKey";
                 // 识别不出类型
                 // 用泛型定义
                 [swiftString appendFormat:@"    /// %@\n    var %@: T?\n",key, key];
-
             }
         }];
         
@@ -103,6 +101,7 @@ static const char *sk_handlePropertyMapperKey = "sk_handlePropertyMapperKey";
     if (self.config.jsonType == SKCodeBuilderJSONModelTypeHandyJSON) {
         
         /// 1. implement an empty initializer.
+        
         [swiftString appendFormat:@"\n    required init() {}\n"];
         
         /// 2. Custom property mapper.
@@ -143,23 +142,15 @@ static const char *sk_handlePropertyMapperKey = "sk_handlePropertyMapperKey";
 }
 
 - (void)handleIdValue:(NSString *)idValue key:(NSString *)key swiftString:(NSMutableString *)swiftString ignoreIdValue:(BOOL)ignoreIdValue {
-    
-    void (^handleString)(NSString *, NSString *, NSMutableString *) = ^(NSString *idValue, NSString *key, NSMutableString *hString){
+   
+    if ([key isEqualToString:@"id"] && !ignoreIdValue) { // 字符串id 替换成 itemId
+        [self.handlePropertyMapper setObject:@"id" forKey:@"itemId"];
+        [swiftString appendFormat:@"    /// %@\n    var %@: String?\n",idValue, @"itemId"];
+    } else { // 忽略id，不处理
         if ([(NSString *)idValue length] > 12) {
             [swiftString appendFormat:@"    /// %@\n    var %@: String?\n",key, key];
         } else {
             [swiftString appendFormat:@"    /// %@\n    var %@: String?\n",idValue, key];
-        }
-    };
-    
-    if (ignoreIdValue) { // 忽略id，不处理
-        handleString(idValue, key, swiftString);
-    } else {
-        if ([key isEqualToString:@"id"]) { // 字符串id 替换成 itemId
-            [self.handlePropertyMapper setObject:@"id" forKey:@"itemId"];
-            [swiftString appendFormat:@"    /// %@\n    var %@: String?\n",idValue, @"itemId"];
-        } else {
-            handleString(idValue, key, swiftString);
         }
     }
 }
@@ -191,7 +182,7 @@ static const char *sk_handlePropertyMapperKey = "sk_handlePropertyMapperKey";
     }
 }
 
-- (void)handleNumberValue:(NSNumber *)numValue key:(NSString *)key swiftString:(NSMutableString *)swiftString {
+- (void)handleIdNumberValue:(NSNumber *)numValue key:(NSString *)key swiftString:(NSMutableString *)swiftString ignoreIdValue:(BOOL)ignoreIdValue{
     
     const char *type = [numValue objCType];
     
@@ -205,11 +196,17 @@ static const char *sk_handlePropertyMapperKey = "sk_handlePropertyMapperKey";
         
     } else if (strcmp(type, @encode(char)) == 0 || strcmp(type, @encode(unsigned char)) == 0) {
         // char 字符串
-        [swiftString appendFormat:@"    /// %@\n    var %@: String?\n",numValue, key];
+        [self handleIdValue:(NSString *)numValue key:key swiftString:swiftString ignoreIdValue:ignoreIdValue];
         
     } else   {
         // int, long, longlong, unsigned int,unsigned longlong 类型
-        [swiftString appendFormat:@"    /// %@\n    var %@: Int = 0\n",numValue, key];
+        if ([key isEqualToString:@"id"] && !ignoreIdValue) { // 字符串id 替换成 itemId
+            [self.handlePropertyMapper setObject:@"id" forKey:@"itemId"];
+            [swiftString appendFormat:@"    /// %@\n    var %@: Int = 0\n",numValue, @"itemId"];
+            
+        } else { // 忽略id，不处理
+            [swiftString appendFormat:@"    /// %@\n    var %@: Int = 0\n",numValue, key];
+        }
     }
 }
 

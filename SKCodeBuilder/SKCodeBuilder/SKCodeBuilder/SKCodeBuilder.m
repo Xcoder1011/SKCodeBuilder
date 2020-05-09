@@ -62,7 +62,6 @@
     
     [mString insertString:[NSString stringWithFormat:@"\n#import \"%@.h\"\n\n",self.config.rootModelName] atIndex:0];
 
-    
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy/MM/dd"];
     NSString *time = [dateFormatter stringFromDate:[NSDate date]];
@@ -118,7 +117,7 @@
             
             if ([value isKindOfClass:[NSNumber class]]) {
                 // NSNumber 类型
-                [self handleNumberValue:value key:key hString:hString];
+                [self handleIdNumberValue:value key:key hString:hString ignoreIdValue:self.config.jsonType == SKCodeBuilderJSONModelTypeNone];
                 
             } else if ([value isKindOfClass:[NSString class]]) {
                 // NSString 类型
@@ -162,9 +161,9 @@
             [mString appendFormat:@"+ (NSDictionary<NSString *,id> *)modelContainerPropertyGenericClass\n"];
             [mString appendFormat:@"{\n     return @{\n"];
             [self.yymodelPropertyGenericClassDicts enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-                [mString appendFormat:@"                    @\"%@\" : %@.class,\n",key, obj];
+                [mString appendFormat:@"              @\"%@\" : %@.class,\n",key, obj];
             }];
-            [mString appendFormat:@"                    };"];
+            [mString appendFormat:@"             };"];
             [mString appendFormat:@"\n}\n"];
             needLineBreak = YES;
         }
@@ -178,15 +177,45 @@
             [mString appendFormat:@"+ (nullable NSDictionary<NSString *, id> *)modelCustomPropertyMapper\n"];
             [mString appendFormat:@"{\n     return @{\n"];
             [self.handlePropertyMapper enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-                [mString appendFormat:@"                    @\"%@\" : @""\"%@\",\n",key, obj];  //   **\"
+                [mString appendFormat:@"              @\"%@\" : @""\"%@\",\n",key, obj];  //   **\"
             }];
-            [mString appendFormat:@"                    };"];
+            [mString appendFormat:@"             };"];
+            [mString appendFormat:@"\n}\n"];
+        }
+        
+    } else if (self.config.jsonType == SKCodeBuilderJSONModelTypeMJExtension){ // 适配MJExtension
+        
+        /// 1.The generic class mapper for container properties.
+        
+        BOOL needLineBreak = NO;
+        if (self.yymodelPropertyGenericClassDicts.count) {
+            [mString appendFormat:@"+ (NSDictionary *)mj_objectClassInArray\n"];
+            [mString appendFormat:@"{\n     return @{\n"];
+            [self.yymodelPropertyGenericClassDicts enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+                [mString appendFormat:@"              @\"%@\" : %@.class,\n",key, obj];
+            }];
+            [mString appendFormat:@"             };"];
+            [mString appendFormat:@"\n}\n"];
+            needLineBreak = YES;
+        }
+        
+        /// 2.Custom property mapper.
+        
+        if (self.handlePropertyMapper.count) {
+            if (needLineBreak) {
+                [mString appendFormat:@"\n"];
+            }
+            [mString appendFormat:@"+ (NSDictionary *)mj_replacedKeyFromPropertyName\n"];
+            [mString appendFormat:@"{\n     return @{\n"];
+            [self.handlePropertyMapper enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+                [mString appendFormat:@"              @\"%@\" : @""\"%@\",\n",key, obj];  //   **\"
+            }];
+            [mString appendFormat:@"             };"];
             [mString appendFormat:@"\n}\n"];
         }
     }
     
     if (key.length) {
-        // NSLog(@">>>>> self.handleDicts removeObjectForKey: >>>>> %@ ,total: %zd, keys: %@",key , self.handleDicts.count,self.handleDicts.allKeys);
         [self.handleDicts removeObjectForKey:key];
     }
     
@@ -204,22 +233,14 @@
 
 - (void)handleIdValue:(NSString *)idValue key:(NSString *)key hString:(NSMutableString *)hString ignoreIdValue:(BOOL)ignoreIdValue {
     
-    void (^handleString)(NSString *, NSString *, NSMutableString *) = ^(NSString *idValue, NSString *key, NSMutableString *hString){
+    if ([key isEqualToString:@"id"] && !ignoreIdValue) { // 字符串id 替换成 itemId
+        [self.handlePropertyMapper setObject:@"id" forKey:@"itemId"];
+        [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, copy) NSString *%@;\n",idValue,@"itemId"];
+    } else { // 忽略id，不处理
         if ([(NSString *)idValue length] > 12) {
             [hString appendFormat:@"/** %@ */\n@property (nonatomic, copy) NSString *%@;\n",key, key];
         } else {
             [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, copy) NSString *%@;\n",idValue,key];
-        }
-    };
-    
-    if (ignoreIdValue) { // 忽略id，不处理
-        handleString(idValue, key, hString);
-    } else {
-        if ([key isEqualToString:@"id"]) { // 字符串id 替换成 itemId
-            [self.handlePropertyMapper setObject:@"id" forKey:@"itemId"];
-            [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, copy) NSString *%@;\n",idValue,@"itemId"];
-        } else {
-            handleString(idValue, key, hString);
         }
     }
 }
@@ -255,7 +276,7 @@
     }
 }
 
-- (void)handleNumberValue:(NSNumber *)numValue key:(NSString *)key hString:(NSMutableString *)hString {
+- (void)handleIdNumberValue:(NSNumber *)numValue key:(NSString *)key hString:(NSMutableString *)hString ignoreIdValue:(BOOL)ignoreIdValue{
     
     const char *type = [numValue objCType];
     
@@ -268,12 +289,17 @@
         [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, assign) BOOL %@;\n",numValue,key];
         
     } else if (strcmp(type, @encode(char)) == 0 || strcmp(type, @encode(unsigned char)) == 0) {
-        // char 字符串
-        [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, copy) NSString *%@;\n",numValue,key];
         
+        [self handleIdValue:(NSString *)numValue key:key hString:hString ignoreIdValue:ignoreIdValue];
+             
     } else  {
         // int, long, longlong, unsigned int,unsigned longlong 类型
-        [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, assign) NSInteger %@;\n",numValue,key];
+        if ([key isEqualToString:@"id"] && !ignoreIdValue) { // 字符串id 替换成 itemId
+            [self.handlePropertyMapper setObject:@"id" forKey:@"itemId"];
+            [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, assign) NSInteger %@;\n",numValue,@"itemId"];
+        } else {
+            [hString appendFormat:@"/** eg. %@ */\n@property (nonatomic, assign) NSInteger %@;\n",numValue,key];
+        }
     }
 }
 
