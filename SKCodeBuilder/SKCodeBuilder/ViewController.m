@@ -236,7 +236,7 @@ static NSString *const GenerateFilePathCacheKey = @"GenerateFilePathCacheKey";
     self.builder.config.rootModelName = rootModelName;
     [[NSUserDefaults standardUserDefaults] setObject:rootModelName forKey:RootModelNameCacheKey];
     
-    NSString *authorName = self.authorNameTF.stringValue.length ? self.authorNameTF.stringValue : @"NSObject";
+    NSString *authorName = self.authorNameTF.stringValue.length ? self.authorNameTF.stringValue : @"SKCodeBuilder";
     self.builder.config.authorName = authorName;
     [[NSUserDefaults standardUserDefaults] setObject:authorName forKey:AuthorNameCacheKey];
     
