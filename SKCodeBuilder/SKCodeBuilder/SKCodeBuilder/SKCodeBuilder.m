@@ -177,7 +177,7 @@
             [mString appendFormat:@"+ (nullable NSDictionary<NSString *, id> *)modelCustomPropertyMapper\n"];
             [mString appendFormat:@"{\n     return @{\n"];
             [self.handlePropertyMapper enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-                [mString appendFormat:@"              @\"%@\" : @""\"%@\",\n",key, obj];  //   **\"
+                [mString appendFormat:@"              @\"%@\" : @\"%@\",\n",key, obj];  //   **\"
             }];
             [mString appendFormat:@"             };"];
             [mString appendFormat:@"\n}\n"];
@@ -208,7 +208,7 @@
             [mString appendFormat:@"+ (NSDictionary *)mj_replacedKeyFromPropertyName\n"];
             [mString appendFormat:@"{\n     return @{\n"];
             [self.handlePropertyMapper enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-                [mString appendFormat:@"              @\"%@\" : @""\"%@\",\n",key, obj];  //   **\"
+                [mString appendFormat:@"              @\"%@\" : @\"%@\",\n",key, obj];  //   **\"
             }];
             [mString appendFormat:@"             };"];
             [mString appendFormat:@"\n}\n"];
