@@ -154,8 +154,8 @@ static NSString *const GenerateFilePathCacheKey = @"GenerateFilePathCacheKey";
     [openPanel setCanChooseDirectories:YES];
     NSInteger modal = [openPanel runModal];
     if (modal == NSModalResponseOK){
-        NSURL *files = [[openPanel URLs] objectAtIndex:0];
-        _outputFilePath = files.path;
+        NSURL *fileUrl = [[openPanel URLs] objectAtIndex:0];
+        _outputFilePath = fileUrl.path;
         NSLog(@"chooseOutputFilePath: %@",_outputFilePath);
     }
 }

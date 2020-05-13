@@ -87,8 +87,7 @@ static const char *sk_handlePropertyMapperKey = "sk_handlePropertyMapperKey";
                 
             } else {
                 // 识别不出类型
-                // 用泛型定义
-                [swiftString appendFormat:@"    /// %@\n    var %@: T?\n",key, key];
+                [swiftString appendFormat:@"    /// %@\n    var %@: Any?\n",key, key];
             }
         }];
         
