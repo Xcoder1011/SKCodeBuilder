@@ -21,6 +21,7 @@
 		BC7AD141243DB650009ADE2F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BC7AD13F243DB650009ADE2F /* Main.storyboard */; };
 		BC7AD144243DB650009ADE2F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BC7AD143243DB650009ADE2F /* main.m */; };
 		BC9A940A2457F513009B9A27 /* ExampleModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BC9A94092457F513009B9A27 /* ExampleModel.m */; };
+		BCCE8CFF246BD36700404F6B /* NSObject+UUPerforming.m in Sources */ = {isa = PBXBuildFile; fileRef = BCCE8CFD246BD36700404F6B /* NSObject+UUPerforming.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +52,8 @@
 		BC7AD145243DB650009ADE2F /* SKCodeBuilder.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SKCodeBuilder.entitlements; sourceTree = "<group>"; };
 		BC9A94082457F513009B9A27 /* ExampleModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleModel.h; sourceTree = "<group>"; };
 		BC9A94092457F513009B9A27 /* ExampleModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExampleModel.m; sourceTree = "<group>"; };
+		BCCE8CFD246BD36700404F6B /* NSObject+UUPerforming.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSObject+UUPerforming.m"; sourceTree = "<group>"; };
+		BCCE8CFE246BD36700404F6B /* NSObject+UUPerforming.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSObject+UUPerforming.h"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +93,8 @@
 				BC55BC412466AFA900BD4CC8 /* ExampleWeiboModel.swift */,
 				BC55BC3D2466AF4E00BD4CC8 /* ExampleHandyJSONModel.swift */,
 				BC55BC3E2466AF4E00BD4CC8 /* HandyJSONTest.swift */,
+				BCCE8CFE246BD36700404F6B /* NSObject+UUPerforming.h */,
+				BCCE8CFD246BD36700404F6B /* NSObject+UUPerforming.m */,
 			);
 			path = Examples;
 			sourceTree = "<group>";
@@ -204,6 +209,7 @@
 				BC55BC542466B71700BD4CC8 /* ExampleYYModel.m in Sources */,
 				BC55BC402466AF4E00BD4CC8 /* HandyJSONTest.swift in Sources */,
 				BC55BC422466AFA900BD4CC8 /* ExampleWeiboModel.swift in Sources */,
+				BCCE8CFF246BD36700404F6B /* NSObject+UUPerforming.m in Sources */,
 				BC7AD13C243DB64F009ADE2F /* ViewController.m in Sources */,
 				BC7AD144243DB650009ADE2F /* main.m in Sources */,
 				BC9A940A2457F513009B9A27 /* ExampleModel.m in Sources */,
