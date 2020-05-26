@@ -1,6 +1,7 @@
 
 # SKCodeBuilder
 
+Swift版：[https://github.com/Xcoder1011/SKGenerateModelTool](https://github.com/Xcoder1011/SKGenerateModelTool)
 
 - 支持通过URL链接或json字符串一键生成model文件
 - 支持自定义model父类、自定义model前缀、自定义文件名、自定义作者名

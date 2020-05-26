@@ -73,15 +73,34 @@ static NSString *const GenerateFilePathCacheKey = @"GenerateFilePathCacheKey";
     [self loadUserLastInputContent];
 }
 
-/// GET request URL
+/// GET / POST request URL
 - (IBAction)requestURLBtnClicked:(NSButton *)sender {
    
-    NSLog(@"URL = %@",self.urlTF.stringValue);
     NSString *urlString = self.urlTF.stringValue;
     if (!urlString || urlString.length == 0)  return;
+    NSLog(@"URL = %@",self.urlTF.stringValue);
     __weak typeof(self) weakself = self;
     NSURLSession *session = [NSURLSession sharedSession];
-    NSURLSessionDataTask *task = [session dataTaskWithURL:[NSURL URLWithString:urlString] completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    if (self.reqTypeBtn.indexOfSelectedItem == 1) { // post
+        if (url.query && url.query.length) {
+            urlString = [urlString stringByReplacingOccurrencesOfString:url.query withString:@""];
+            if ([urlString hasSuffix:@"?"]) {
+                urlString = [urlString substringToIndex:urlString.length - 1];
+            }
+            NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:urlString]];
+            NSData *data = [url.query dataUsingEncoding:NSUTF8StringEncoding];
+            if (data) {
+                req.HTTPBody = data;
+            }
+            req.HTTPMethod = @"POST";
+            [req setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+            request = [req copy];
+        }
+    }
+    
+    NSURLSessionDataTask *task = [session dataTaskWithRequest:request completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         if (!error && data) {
             id jsonObject = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
             if (jsonObject) {
