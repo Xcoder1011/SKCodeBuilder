@@ -15,6 +15,7 @@
 		BC55BC4E2466B6AE00BD4CC8 /* ExampleMJExtensionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BC55BC4C2466B6AE00BD4CC8 /* ExampleMJExtensionModel.m */; };
 		BC55BC542466B71700BD4CC8 /* ExampleYYModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BC55BC522466B71700BD4CC8 /* ExampleYYModel.m */; };
 		BC6EAE5424B704E000B5F5ED /* ExampleEncryptConst.m in Sources */ = {isa = PBXBuildFile; fileRef = BC6EAE5324B704E000B5F5ED /* ExampleEncryptConst.m */; };
+		BC6EAE5B24B7243300B5F5ED /* EncryptionController.m in Sources */ = {isa = PBXBuildFile; fileRef = BC6EAE5A24B7243300B5F5ED /* EncryptionController.m */; };
 		BC78816E2463F6E9004BFC68 /* SKCodeBuilder+Swift.m in Sources */ = {isa = PBXBuildFile; fileRef = BC78816D2463F6E9004BFC68 /* SKCodeBuilder+Swift.m */; };
 		BC7AD139243DB64F009ADE2F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = BC7AD138243DB64F009ADE2F /* AppDelegate.m */; };
 		BC7AD13C243DB64F009ADE2F /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BC7AD13B243DB64F009ADE2F /* ViewController.m */; };
@@ -41,6 +42,8 @@
 		BC6EAE4E24B7041100B5F5ED /* SKEncryptHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SKEncryptHeader.h; sourceTree = "<group>"; };
 		BC6EAE5224B704E000B5F5ED /* ExampleEncryptConst.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExampleEncryptConst.h; sourceTree = "<group>"; };
 		BC6EAE5324B704E000B5F5ED /* ExampleEncryptConst.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExampleEncryptConst.m; sourceTree = "<group>"; };
+		BC6EAE5924B7243300B5F5ED /* EncryptionController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EncryptionController.h; sourceTree = "<group>"; };
+		BC6EAE5A24B7243300B5F5ED /* EncryptionController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EncryptionController.m; sourceTree = "<group>"; };
 		BC78816C2463F6E9004BFC68 /* SKCodeBuilder+Swift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SKCodeBuilder+Swift.h"; sourceTree = "<group>"; };
 		BC78816D2463F6E9004BFC68 /* SKCodeBuilder+Swift.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "SKCodeBuilder+Swift.m"; sourceTree = "<group>"; };
 		BC7AD134243DB64F009ADE2F /* SKCodeBuilder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SKCodeBuilder.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -129,6 +132,8 @@
 				BC7AD138243DB64F009ADE2F /* AppDelegate.m */,
 				BC7AD13A243DB64F009ADE2F /* ViewController.h */,
 				BC7AD13B243DB64F009ADE2F /* ViewController.m */,
+				BC6EAE5924B7243300B5F5ED /* EncryptionController.h */,
+				BC6EAE5A24B7243300B5F5ED /* EncryptionController.m */,
 				BC6EAE5224B704E000B5F5ED /* ExampleEncryptConst.h */,
 				BC6EAE5324B704E000B5F5ED /* ExampleEncryptConst.m */,
 				BC6EAE5824B713DA00B5F5ED /* SKEncryptString */,
@@ -224,6 +229,7 @@
 				BC7AD144243DB650009ADE2F /* main.m in Sources */,
 				BC9A940A2457F513009B9A27 /* ExampleModel.m in Sources */,
 				BC55BC3F2466AF4E00BD4CC8 /* ExampleHandyJSONModel.swift in Sources */,
+				BC6EAE5B24B7243300B5F5ED /* EncryptionController.m in Sources */,
 				BC78816E2463F6E9004BFC68 /* SKCodeBuilder+Swift.m in Sources */,
 				BC063BB0244FF0F90009C4E7 /* NSString+CodeBuilder.m in Sources */,
 				BC7AD139243DB64F009ADE2F /* AppDelegate.m in Sources */,

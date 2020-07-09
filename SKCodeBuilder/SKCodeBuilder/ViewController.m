@@ -8,7 +8,6 @@
 
 #import "ViewController.h"
 #import "SKCodeBuilder/SKCodeBuilderHeader.h"
-#import "ExampleEncryptConst.h"
 
 static NSString *const LastInputURLCacheKey = @"LastInputURLCacheKey";
 static NSString *const SuperClassNameCacheKey = @"SuperClassNameCacheKey";
@@ -70,29 +69,7 @@ static NSString *const GenerateFilePathCacheKey = @"GenerateFilePathCacheKey";
 }
 
 - (void)test2666 {
-    NSString *jsonString = self.jsonTextView.textStorage.string;
-    NSLog(@"原始字符串：%@",jsonString);
-    __weak typeof(self) weakself = self;
-    [SKCodeBuilder encryptString:jsonString withKey:@"" completion:^(NSString *hStr, NSString *mStr) {
-        NSLog(@"加密后hStr：\n%@", hStr);
-        NSLog(@"加密后mStr：\n%@", mStr);
-        NSColor *color = [NSColor colorWithCalibratedRed:215/255.f green:0/255.f  blue:143/255.f  alpha:1.0];
-        [weakself configJsonTextViewWith:hStr textView:weakself.hTextView color:color];
-        [weakself configJsonTextViewWith:mStr textView:weakself.mTextView color:color];
-    }];
-    
-    
-    NSString *decryptStr = sk_OCString(_2498876181);
-    NSLog(@"解密后：%@", decryptStr);
-
-    decryptStr = sk_OCString(_905588837);
-    NSLog(@"解密后：%@", decryptStr);
-
-    decryptStr = sk_OCString(_1242105574);
-    NSLog(@"解密后：%@", decryptStr);
-
-    decryptStr = sk_OCString(_3740838830);
-    NSLog(@"解密后：%@", decryptStr);
+ 
 }
 
 - (void)viewDidAppear {
@@ -145,10 +122,6 @@ static NSString *const GenerateFilePathCacheKey = @"GenerateFilePathCacheKey";
 - (IBAction)startMakeCode:(NSButton *)sender {
     
     NSString *jsonString = self.jsonTextView.textStorage.string;
-    [self test2666];
-    return;
-    
-    
     NSDictionary *jsonDict = [jsonString _toJsonDict];
     BOOL isvalid = [NSJSONSerialization isValidJSONObject:jsonDict];
     if (!isvalid) {
