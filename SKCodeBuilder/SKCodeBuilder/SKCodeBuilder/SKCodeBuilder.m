@@ -348,6 +348,74 @@
     }
 }
 
++ (void)encryptString:(NSString *)str withKey:(NSString *)key completion:(void (^)(NSString *, NSString *))completion{
+    
+    NSString *tempString = [str stringByReplacingOccurrencesOfString:@" " withString:@""];
+    if (tempString.length == 0
+        || !completion) return;
+    
+    NSMutableString *value = [NSMutableString string];
+    NSMutableString *secretValues= [NSMutableString string];
+  
+    const char *cstring = str.UTF8String;
+    int length = (int)strlen(cstring);
+    
+    int keyLength = 0;
+    const char *ckeystring = NULL;
+    if (key.length) {
+        ckeystring = key.UTF8String;
+        keyLength =(int)strlen(ckeystring);
+    }
+    const char factor = arc4random_uniform(pow(2, sizeof(char) * 8) - 1);
+    char a = 'c';
+    
+    if (keyLength > 0 && ckeystring) {
+        char b = 'd';
+        for (int i = 0; i< keyLength; i++) {
+            int k = b ^ factor ^ ckeystring[i];
+            [secretValues appendFormat:@"%d,",k];
+        }
+        [secretValues appendString:@"0"];
+        
+        int cipherIndex = 0;
+        for (int i = 0; i< length; i++) {
+            cipherIndex = cipherIndex % keyLength;
+            int v = a ^ factor ^ ckeystring[cipherIndex];
+            [value appendFormat:@"%d,", v ^ cstring[i]];
+            cipherIndex++;
+        }
+    } else {
+        for (int i = 0; i< length; i++) {
+            [value appendFormat:@"%d,",  a ^ factor ^ cstring[i]];
+        }
+    }
+    [value appendString:@"0"];
+    
+    NSString *var = [NSString stringWithFormat:@"_%@", str.adler32];
+    NSMutableString *hStr = [NSMutableString string];
+    [hStr appendFormat:@"/** %@ */\n",str];
+    [hStr appendFormat:@"extern const SKEncryptString * const %@;",var];
+    
+    NSMutableString *mStr = [NSMutableString string];
+    [mStr appendFormat:@"/** %@ */\n",str];
+    [mStr appendFormat:@"const SKEncryptString * const %@ = &(SKEncryptString){\n",var];
+    
+    [mStr appendFormat:@"       .factor = (char)%@,\n",[NSString stringWithFormat:@"%d", factor]];
+    [mStr appendFormat:@"       .value = (char[]){%@},\n",value];
+    [mStr appendFormat:@"       .length = %d,\n",length];
+    
+    if (keyLength > 0) {
+        [mStr appendFormat:@"       .key = (char[]){%@},\n",secretValues];
+        [mStr appendFormat:@"       .kl = %d\n",keyLength];
+    }
+    
+    [mStr appendFormat:@"};\n"];
+
+    if (completion) {
+        completion(hStr, mStr);
+    }
+}
+
 - (NSMutableDictionary *)yymodelPropertyGenericClassDicts {
     if (!_yymodelPropertyGenericClassDicts) {
         _yymodelPropertyGenericClassDicts = [NSMutableDictionary new];

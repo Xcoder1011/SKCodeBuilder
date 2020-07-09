@@ -14,6 +14,7 @@
 		BC55BC422466AFA900BD4CC8 /* ExampleWeiboModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC55BC412466AFA900BD4CC8 /* ExampleWeiboModel.swift */; };
 		BC55BC4E2466B6AE00BD4CC8 /* ExampleMJExtensionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BC55BC4C2466B6AE00BD4CC8 /* ExampleMJExtensionModel.m */; };
 		BC55BC542466B71700BD4CC8 /* ExampleYYModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BC55BC522466B71700BD4CC8 /* ExampleYYModel.m */; };
+		BC6EAE5424B704E000B5F5ED /* ExampleEncryptConst.m in Sources */ = {isa = PBXBuildFile; fileRef = BC6EAE5324B704E000B5F5ED /* ExampleEncryptConst.m */; };
 		BC78816E2463F6E9004BFC68 /* SKCodeBuilder+Swift.m in Sources */ = {isa = PBXBuildFile; fileRef = BC78816D2463F6E9004BFC68 /* SKCodeBuilder+Swift.m */; };
 		BC7AD139243DB64F009ADE2F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = BC7AD138243DB64F009ADE2F /* AppDelegate.m */; };
 		BC7AD13C243DB64F009ADE2F /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BC7AD13B243DB64F009ADE2F /* ViewController.m */; };
@@ -37,6 +38,9 @@
 		BC55BC4D2466B6AE00BD4CC8 /* ExampleMJExtensionModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleMJExtensionModel.h; sourceTree = "<group>"; };
 		BC55BC522466B71700BD4CC8 /* ExampleYYModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExampleYYModel.m; sourceTree = "<group>"; };
 		BC55BC532466B71700BD4CC8 /* ExampleYYModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExampleYYModel.h; sourceTree = "<group>"; };
+		BC6EAE4E24B7041100B5F5ED /* SKEncryptHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SKEncryptHeader.h; sourceTree = "<group>"; };
+		BC6EAE5224B704E000B5F5ED /* ExampleEncryptConst.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExampleEncryptConst.h; sourceTree = "<group>"; };
+		BC6EAE5324B704E000B5F5ED /* ExampleEncryptConst.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExampleEncryptConst.m; sourceTree = "<group>"; };
 		BC78816C2463F6E9004BFC68 /* SKCodeBuilder+Swift.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SKCodeBuilder+Swift.h"; sourceTree = "<group>"; };
 		BC78816D2463F6E9004BFC68 /* SKCodeBuilder+Swift.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "SKCodeBuilder+Swift.m"; sourceTree = "<group>"; };
 		BC7AD134243DB64F009ADE2F /* SKCodeBuilder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SKCodeBuilder.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -94,6 +98,14 @@
 			path = Examples;
 			sourceTree = "<group>";
 		};
+		BC6EAE5824B713DA00B5F5ED /* SKEncryptString */ = {
+			isa = PBXGroup;
+			children = (
+				BC6EAE4E24B7041100B5F5ED /* SKEncryptHeader.h */,
+			);
+			path = SKEncryptString;
+			sourceTree = "<group>";
+		};
 		BC7AD12B243DB64E009ADE2F = {
 			isa = PBXGroup;
 			children = (
@@ -117,6 +129,9 @@
 				BC7AD138243DB64F009ADE2F /* AppDelegate.m */,
 				BC7AD13A243DB64F009ADE2F /* ViewController.h */,
 				BC7AD13B243DB64F009ADE2F /* ViewController.m */,
+				BC6EAE5224B704E000B5F5ED /* ExampleEncryptConst.h */,
+				BC6EAE5324B704E000B5F5ED /* ExampleEncryptConst.m */,
+				BC6EAE5824B713DA00B5F5ED /* SKEncryptString */,
 				BC55BC33246692A400BD4CC8 /* Examples */,
 				BC55BC322466928800BD4CC8 /* SKCodeBuilder */,
 				BC7AD13D243DB650009ADE2F /* Assets.xcassets */,
@@ -199,6 +214,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BC6EAE5424B704E000B5F5ED /* ExampleEncryptConst.m in Sources */,
 				BC063BB3244FF40F0009C4E7 /* SKCodeBuilder.m in Sources */,
 				BC55BC4E2466B6AE00BD4CC8 /* ExampleMJExtensionModel.m in Sources */,
 				BC55BC542466B71700BD4CC8 /* ExampleYYModel.m in Sources */,

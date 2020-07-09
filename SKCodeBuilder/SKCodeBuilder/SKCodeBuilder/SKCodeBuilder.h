@@ -37,7 +37,10 @@ typedef void (^GenerateFileComplete)(BOOL success, NSString *filePath);
                           hString:(NSMutableString *)hString
                           mString:(NSMutableString *)mString
                          complete:(GenerateFileComplete)complete;
-                           
+
+/// 字符串加密 only for SKEncryptString
++ (void)encryptString:(NSString *)str withKey:(NSString *)key completion:(void(^)(NSString *,NSString *))completion;
+                   
 @end
 
 @interface SKCodeBuilderConfig : NSObject
@@ -56,5 +59,3 @@ typedef void (^GenerateFileComplete)(BOOL success, NSString *filePath);
 @property (nonatomic, assign) SKCodeBuilderJSONModelType jsonType;
 
 @end
-
-
